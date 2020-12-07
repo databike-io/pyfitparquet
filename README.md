@@ -1,10 +1,7 @@
-# fit-ingest
-
 ## Project: Fit-Ingest
 
 Perform FIT file data ingest and serialization to parquet.
 
-![sysdesign_v1](./sysdesign_v1.jpg)
 ![sysdesign](https://github.com/breakawayfit/fit-ingest/blob/main/sysdesign_v1.jpg)
 
 ___
