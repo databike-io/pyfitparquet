@@ -71,7 +71,7 @@ public :
         for (FIT_UINT16 i = 0; i < (FIT_UINT16)mesg.GetNumFields(); i++)
         {
             fit::Field* field = mesg.GetFieldByIndex(i);
-            std::wcout << L"   Field" << i << " (" << field->GetName().c_str() << ") has " << field->GetNumValues() << L" value(s)\n";
+            std::wcout << L"   Field" << i << " (" << field->GetName().c_str() << ", " << field->GetNum() << ") has " << field->GetNumValues() << L" value(s)\n";
             PrintValues(*field);
         }
 
