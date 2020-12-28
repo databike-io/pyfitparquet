@@ -19,6 +19,9 @@ $ cmake -H. -B_build -DCMAKE_PREFIX_PATH=$CONDA_PREFIX -DCMAKE_INSTALL_PREFIX="`
 $ cmake --build _build 
 ```
 
+```
+export DYLD_LIBRARY_PATH=${CONDA_PREFIX}/lib
+```
 ___
 
 ### FIT File Decode Test:
