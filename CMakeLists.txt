@@ -33,5 +33,6 @@ if (ARROW_LINK_SHARED)
 else()
     # ** NOTE: static linkage does NOT work :( **
     target_link_libraries(fitparquet PRIVATE arrow_static parquet_static fitSDK)
+    # ** NOTE: static linkage does NOT work :( **
 endif()
 

@@ -10,6 +10,9 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 
+# Notebook checkpoints
+.ipynb_checkpoints/
+
 # Local VSCode config
 .vscode/
 
@@ -19,6 +22,7 @@ _deps
 # Build dir
 _build/
 data/
+arrow/
 
 # Prerequisites
 *.d

@@ -1,0 +1,14 @@
+name: databike
+channels:
+  - conda-forge
+dependencies:
+  - python==3.9
+  - boost
+  - snappy
+  - thrift-cpp
+  - libutf8proc
+  
+  # Below: just for test notebook
+  - jupyterlab
+  - pyarrow
+  - pandas
