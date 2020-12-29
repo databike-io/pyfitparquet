@@ -22,13 +22,7 @@ ___
 
 ### Execution:
 
-Note: currently **fitparquet** can only link libraries dynamically, some of which must be pulled from your conda install. Consequently, you must either export the DYLD_LIBRARY_PATH environment variable appropriately to you databike ${CONDA_PREFIX}/lib, which will likely screw up some other command-line functinality that terminal, or (suggested) feed the variable in on the command-line for each run as below. Or run FitToParquetTest.ipynb in jupyter on your own set of .fit files for an example and test of current functionality.
-
-To decode a single .fit file from command-line:
-```
-$ cd _build
-$ decoder <FIT_FILE>
-```
+You can run [FitToParquetTest.ipynb](https://github.com/breakawayfit/fit-ingest/blob/main/FitToParquetTest.ipynb) in jupyter for an example test of current serialization functionality on a data directory of your own .fit files. You can also run from the command-line directly as below. Note: currently **fitparquet** can only link libraries dynamically, some of which must be pulled from your conda install. Consequently, you must either export/set the DYLD_LIBRARY_PATH environment variable appropriately to your databike: ${CONDA_PREFIX}/lib, which will likely screw up some other command-line functionality in that terminal, or (suggested) feed the variable in on the command-line for each run as below. 
 
 To serialize a single .fit to .parquet file from command-line:
 ```
@@ -36,5 +30,8 @@ $ cd _build
 $ DYLD_LIBRARY_PATH=${CONDA_PREFIX}/lib fitparquet <FIT_FILE> <PARQUET_FILE>
 ```
 
-
-
+To decode a single .fit file to stdout from command-line:
+```
+$ cd _build
+$ decoder <FIT_FILE>
+```
