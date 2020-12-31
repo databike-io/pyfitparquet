@@ -1,0 +1,37 @@
+# Note: though this configuration is technically written in YAML, only the simplified
+# templated structure below is expected (i.e. parsing is not fully-YAML-complient)
+
+# Epoch format (for timestamps/time_created) must be either: 
+#   UNIX (i.e. seconds since 1970-01-01T00:00:00Z) or
+#   FIT  (i.e. seconds since 1989-12-31T00:00:00Z, see Global
+#         Profile in https://developer.garmin.com/fit/protocol/)
+epoch_format: UNIX 
+
+# FIT file source data columns: containing filename
+# and/or full-path-uri (as best as ascertainable)
+fit_filename: true
+fit_filepath: false
+
+# FIT enumeration columns: containing numeric  
+# indexes and/or enumerated string names
+manufacturer_index: true
+manufacturer_name: true
+product_index: true
+product_name: true
+mesg_index: true
+mesg_name: true
+field_index: true
+field_name: true
+
+# Field value columns: including (at least) string_data is suggested, else some FIT field value data
+# will be dropped on serialization. All field data can (and will) be written to string if enabled. 
+# For numeric types (float/integer), best attempt is made to respect original FIT data type (w/some
+# caveats, see FIT field scale/offset application in https://developer.garmin.com/fit/protocol/)
+string_data: true
+float_data: true
+integer_data: true
+
+# Row exclusion options: rows with null/empty field values, rows with timestamp
+# field name (timestamp is broken-out into its own column by default for mesg rows)
+exclude_empty_values: false
+exclude_timestamp_values: true

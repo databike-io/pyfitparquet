@@ -3,13 +3,13 @@ channels:
   - conda-forge
 dependencies:
   - python==3.8
-  - boost
   - cmake
   - snappy
   - thrift-cpp
   - libutf8proc
+  - anaconda::boost
   
-  # Below: just for test notebook
+  # Below: for notebook tests
   - jupyterlab
   - nodejs
   - openjdk

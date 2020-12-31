@@ -1,7 +1,14 @@
 cmake_minimum_required(VERSION 3.15)
 
-# set the project name
+# Set the project name
 project(fit-ingest)
+
+# Break if Conda not setup/activated
+if(NOT DEFINED ENV{CONDA_DEFAULT_ENV})
+    message( FATAL_ERROR "(Mini)Conda enviroment required" )
+elseif(NOT $ENV{CONDA_DEFAULT_ENV} STREQUAL "databike")
+    message( FATAL_ERROR "Conda environment: 'databike' must be activated" )
+endif()
 
 # Specify the C++ standard
 set(CMAKE_CXX_STANDARD 11)
@@ -36,3 +43,11 @@ else()
     # ** NOTE: static linkage does NOT work :( **
 endif()
 
+# Build config executable
+set(Boost_USE_STATIC_LIBS ON)
+find_package(Boost COMPONENTS filesystem REQUIRED)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
+# Setting fvisibility to resolve ld: visibility warning (conda boost libs)
+
+add_executable(config_reader config.cpp)
+target_link_libraries(config_reader PUBLIC Boost::filesystem)

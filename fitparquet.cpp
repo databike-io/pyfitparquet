@@ -197,6 +197,7 @@ public:
                     }
 
                     // Finalize the timestamp on this block of rows
+                    // TODO: add epoch offset of 631065600 sec
                     for (int i = block_i; i < pqrows.size(); ++i)
                         pqrows[i].set_timestamp(timestamp_a);
                 }
