@@ -40,14 +40,15 @@ $ decoder <FIT_FILE>
 
 ### TODOs:
 
-- add timestamp epoch translation 
-    - including epoch time verification (see time_created/timestamp descrepancy in Who_Dares_Woop.fit)
+- **X** add timestamp epoch translation (null'd when file_id::time_created missing, see: Who_Dares_Woop.fit)
+- **X** employ expanded Arrow Data Types in Schema (timestamp)
+- **X** YAML configurable parquet table structuring 
+    - (**cancelled**) arbitrary field_type column breakouts
+    - **X** add ENUM name expansions: manufacturer, product, field, mesg
+    - **X** expand field_type: string, float, integer (and extra column)
+    - **X** add fit_filename and fit_file_uri reference columns
+- **X** change to UNIX .cc, .h extensions 
 - enable static linking of fitparquet executable
 - enable python bindings for fitparquet executable
-- employ expanded Arrow Data Types in Schema (beyond Parquet types)
-- YAML configurable parquet table structuring 
-    - (**cancelled**) arbitrary field_type column breakouts
-    - ENUM inclusions/expansions: manufacturer, product, field, mesg
-    - expand field_type: string, float, integer (and extra column)
-    - fit_filename (or fit_filepath) reference column
-- examine 
+- move default decoder into FitCppSDK where it came from
+- add disclaimer comments to src files 

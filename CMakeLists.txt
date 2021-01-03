@@ -23,6 +23,12 @@ set(Parquet_DIR "${CMAKE_INSTALL_PREFIX}/lib/cmake/arrow")
 find_package(Arrow CONFIG REQUIRED)
 find_package(Parquet CONFIG REQUIRED)
 
+# Import needed Boost libraries
+set(Boost_USE_STATIC_LIBS ON)
+find_package(Boost COMPONENTS filesystem REQUIRED)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
+# Set fvisibility to resolve ld: visibility warning (conda boost libs)
+
 # Build fitCppSDK library
 file(GLOB SDKSRC "${FITSDK_VERSION}/cpp/*.cpp")
 add_library(fitSDK ${SDKSRC})
@@ -33,21 +39,12 @@ add_executable(decoder decode.cpp)
 target_link_libraries(decoder PRIVATE fitSDK)
 
 # Build fitparquet executable
-add_executable(fitparquet fitparquet.cpp)
+add_executable(fitparquet fitparquet.cc)
 if (ARROW_LINK_SHARED)
     # Prefer shared linkage but use static if shared build is deactivated
-    target_link_libraries(fitparquet PRIVATE arrow_shared parquet_shared fitSDK)
+    target_link_libraries(fitparquet PRIVATE arrow_shared parquet_shared Boost::filesystem fitSDK)
 else()
     # ** NOTE: static linkage does NOT work :( **
-    target_link_libraries(fitparquet PRIVATE arrow_static parquet_static fitSDK)
+    target_link_libraries(fitparquet PRIVATE arrow_static parquet_static Boost::filesystem fitSDK)
     # ** NOTE: static linkage does NOT work :( **
 endif()
-
-# Build config executable
-set(Boost_USE_STATIC_LIBS ON)
-find_package(Boost COMPONENTS filesystem REQUIRED)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility=hidden")
-# Setting fvisibility to resolve ld: visibility warning (conda boost libs)
-
-add_executable(config_reader config.cpp)
-target_link_libraries(config_reader PUBLIC Boost::filesystem)

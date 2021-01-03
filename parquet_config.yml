@@ -10,28 +10,33 @@ epoch_format: UNIX
 # FIT file source data columns: containing filename
 # and/or full-path-uri (as best as ascertainable)
 fit_filename: true
-fit_filepath: false
+fit_file_uri: false
 
-# FIT enumeration columns: containing numeric  
-# indexes and/or enumerated string names
-manufacturer_index: true
+# FIT enumeration columns: containing numeric indexes and/or enumerated string names. Including
+# (at least) name or index for each category (manufacturer, product, mesg, and field) is suggested.
+# Fields which are not validly defined in FIT mesgs will be left NULL/None in parquet file.
+manufacturer_index: false
 manufacturer_name: true
 product_index: true
-product_name: true
-mesg_index: true
+product_name: false
+timestamp: true
+mesg_index: false
 mesg_name: true
 field_index: true
 field_name: true
+field_type: true
+units: true
 
-# Field value columns: including (at least) string_data is suggested, else some FIT field value data
-# will be dropped on serialization. All field data can (and will) be written to string if enabled. 
-# For numeric types (float/integer), best attempt is made to respect original FIT data type (w/some
-# caveats, see FIT field scale/offset application in https://developer.garmin.com/fit/protocol/)
-string_data: true
-float_data: true
-integer_data: true
+# Field value columns: best attempt is made to respect original FIT data type (w/some caveats, see 
+# FIT field application of scale/offset in https://developer.garmin.com/fit/protocol/). Note that
+# if set, the value_string column will be assigned data translations of both numeric/string fields.
+# Note: if opening parquet file with pandas, integer column (w/nulls) will be convert to float,
+# see: https://stackoverflow.com/questions/53327973/pandas-converting-null-int64-to-float64
+value_string: true
+value_integer: false
+value_float: true
 
 # Row exclusion options: rows with null/empty field values, rows with timestamp
 # field name (timestamp is broken-out into its own column by default for mesg rows)
-exclude_empty_values: false
-exclude_timestamp_values: true
+exclude_empty_values: true
+exclude_timestamp_values: false
