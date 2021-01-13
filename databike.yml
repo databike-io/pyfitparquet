@@ -1,18 +1,23 @@
 name: databike
 channels:
   - conda-forge
+
 dependencies:
   - python==3.8
   - cmake
   - snappy
-  - thrift-cpp
   - libutf8proc
-  - anaconda::boost
-  
-  # Below: for notebook tests
-  - jupyterlab
+  - boost
+  - boost-cpp
+  - thrift-cpp
+  - pybind11
+
+  # For notebook tests
   - nodejs
-  - openjdk
+  - jupyterlab
   - pandas
-  - pyarrow
-  - pyspark
+  - openjdk
+  - pip
+  - pip:
+    - pyarrow
+    - pyspark

@@ -8,7 +8,7 @@ ___
 
 ### Installation and Build:
 
-Two build scripts are provided to be run in order as below: first [build-arrow.sh](https://github.com/breakawayfit/fit-ingest/blob/main/build-arrow.sh), will clone Apache Arrow (if needed), create the Arrow build system using CMake (in *./arrow/cpp/arrow-build* and *./arrow/cpp/arrow-install*) and then build and install it. The second: [build-fit-ingest.sh](https://github.com/breakawayfit/fit-ingest/blob/main/build-fit-ingest.sh) will create the Fit-Ingest build system (in *./_build*), then build the FitSDK libary and two executables there: **decoder** ([decoder.cpp](https://github.com/breakawayfit/fit-ingest/blob/main/decode.cpp)) and **fitparquet** ([fitparquet.cpp](https://github.com/breakawayfit/fit-ingest/blob/main/fitparquet.cpp)). The **decoder** just prints the contents of a fit file to stdout, while **fitparquet** performs full serialization of fit files to parquet files. Note: the build scripts can be run multiple times without recloning or recreating build systems. You can clean to various levels by simply deleting *./_build*, *./arrow/cpp/arrow-build*, *./arrow/cpp/arrow-install*, or even *./arrow* entirely.
+Two build scripts are provided to be run in order: first [build-arrow.sh](https://github.com/breakawayfit/fit-ingest/blob/main/build-arrow.sh), which will clone Apache Arrow (if needed), then build and install it (in *./arrow/cpp/arrow-build* and *./arrow/cpp/arrow-install*). The second: [build-fit-ingest.sh](https://github.com/breakawayfit/fit-ingest/blob/main/build-fit-ingest.sh) will build (in *./cpp/fit-build*) the FitSDK libary, two executables: **decoder** (provided w/FitSDK [decoder.cpp](https://github.com/breakawayfit/fit-ingest/blob/main/cpp/FitCppSDK_21.40.00/cpp/examples/decode.cpp)) and **fitparquet** ([fitparquet.cpp](https://github.com/breakawayfit/fit-ingest/blob/main/cpp/fitparquet.cpp)), and a python module: **pyfitparquet** ([pyfitparquet.cpp](https://github.com/breakawayfit/fit-ingest/blob/main/cpp/pyfitparquet.cpp)). The **decoder**  prints the contents of a FIT file to stdout, while **fitparquet** performs transformation of FIT files to parquet files, **pyfitparquet** provides the same functionality from python. You can clean the build by deleting *./cpp/fit-build*, *./arrow/cpp/arrow-build*, *./arrow/cpp/arrow-install*, or *./arrow* entirely.
 
 ```
 $ git clone https://github.com/breakawayfit/fit-ingest.git
@@ -22,33 +22,23 @@ ___
 
 ### Execution:
 
-You can run [FitToParquetTest.ipynb](https://github.com/breakawayfit/fit-ingest/blob/main/FitToParquetTest.ipynb) in jupyter for an example test of current serialization functionality on a data directory of your own fit files. You can also run from the command-line directly as below.  
+You can run notebook [FitToParquetTest.ipynb](https://github.com/breakawayfit/fit-ingest/blob/main/notebooks/FitToParquetTest.ipynb) (which uses **pyfitparquet**) to test serialization functionality on a data directory of your own FIT files. Or you can run from the command-line (using **fitparquet** directly) as below.  
 
-Note: currently **fitparquet** can only link libraries dynamically, some of which must be pulled from your conda install. Consequently, you must either export/set the DYLD_LIBRARY_PATH environment variable appropriately to your databike: ${CONDA_PREFIX}/lib, which will likely screw up some other command-line functionality in that terminal, or (suggested) feed the variable in on the command-line for each run as below. 
-
-To serialize a single fit-file to parquet-file from command-line:
+To serialize a single FIT-file to parquet-file from command-line:
 ```
-$ cd _build
-$ DYLD_LIBRARY_PATH=${CONDA_PREFIX}/lib fitparquet <FIT_FILE> <PARQUET_FILE>
+$ cd cpp/fit-build
+$ fitparquet <FIT_FILE> <PARQUET_FILE>
 ```
 
-To decode a single fit-file to stdout from command-line:
+To decode a single FIT-file to stdout from command-line:
 ```
-$ cd _build
+$ cd cpp/fit-build
 $ decoder <FIT_FILE>
 ```
 
 ### TODOs:
 
-- **X** add timestamp epoch translation (null'd when file_id::time_created missing, see: Who_Dares_Woop.fit)
-- **X** employ expanded Arrow Data Types in Schema (timestamp)
-- **X** YAML configurable parquet table structuring 
-    - (**cancelled**) arbitrary field_type column breakouts
-    - **X** add ENUM name expansions: manufacturer, product, field, mesg
-    - **X** expand field_type: string, float, integer (and extra column)
-    - **X** add fit_filename and fit_file_uri reference columns
-- **X** change to UNIX .cc, .h extensions 
-- enable static linking of fitparquet executable
-- enable python bindings for fitparquet executable
-- move default decoder into FitCppSDK where it came from
-- add disclaimer comments to src files 
+- Add C++ cout/cerr logging redirects to python sys.stdout, sys.stderr 
+- Licensing?? Need to address and add disclaimer comments to src files 
+
+

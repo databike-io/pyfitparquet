@@ -19,12 +19,9 @@ echo "== Building FIT lib, decoder, and fitparquet"
 echo "=="
 echo
 
-cd $FIT_INGEST_ROOT
-if [ ! -d "$FIT_INGEST_ROOT/_build" ]; then
-    cmake -H. -B_build \
-        -DCMAKE_PREFIX_PATH=${CONDA_PREFIX} \
-        -DCMAKE_INSTALL_PREFIX=${ARROW_INSTALL} \
-        -DARROW_LINK_SHARED=ON
-fi
+cd $FIT_INGEST_ROOT/cpp
+cmake -H. -Bfit-build \
+    -DCMAKE_PREFIX_PATH=${CONDA_PREFIX} \
+    -DCMAKE_INSTALL_PREFIX=${ARROW_INSTALL}
 
-cmake --build _build
+cmake --build fit-build

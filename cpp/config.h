@@ -38,7 +38,7 @@ public:
         return param_server[param_k];
     }
 
-    // Param exists in config test
+    // Checks for existence of param in config
     bool exists( const std::string& param_k ) {
         std::unordered_map<std::string, std::string>::const_iterator it = param_server.find(param_k);
         if ( it == param_server.end() ) return false;

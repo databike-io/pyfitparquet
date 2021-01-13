@@ -10,8 +10,6 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 
-config.cc
-
 # Notebook checkpoints
 .ipynb_checkpoints/
 
@@ -22,7 +20,7 @@ config.cc
 .DS_Store/
 
 # Build dir
-_build/
+fit-build/
 data/
 arrow/
 

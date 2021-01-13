@@ -41,32 +41,10 @@ target_link_libraries(decoder PRIVATE fitsdk)
 add_executable(fitparquet fitparquet.cc)
 target_link_libraries(fitparquet PRIVATE arrow_shared parquet_shared Boost::filesystem fitsdk)
 
-# Build the pyfitparquet module (defaults to pybind11)
-if (BIND_WITH_BOOST_PYTHON)
-
-    # Import (conda-installed-)python config
-    set(PYTHON_VERSION "python${Boost_PYTHON_VERSION}")
-    set(PYTHON_INCLUDE_DIRS "${CMAKE_PREFIX_PATH}/include/${PYTHON_VERSION}")
-    find_library(PYTHON_LIBRARIES ${PYTHON_VERSION} HINTS "${CMAKE_PREFIX_PATH}/lib")
-    message(STATUS "Found Python libs: ${PYTHON_LIBRARIES}")
-    message(STATUS "Found Python include dir: ${PYTHON_INCLUDE_DIRS}")
-
-    # Create the boost-python module
-    add_compile_definitions(BIND_WITH_BOOST_PYTHON)
-    add_library(pyfitparquet SHARED fitparquet.cc pyfitparquet.cc)
-    set_target_properties(pyfitparquet PROPERTIES PREFIX "" SUFFIX ".so" LINK_FLAGS "-undefined dynamic_lookup")
-    target_include_directories(pyfitparquet PRIVATE ${PYTHON_INCLUDE_DIRS} ${Boost_INCLUDE_DIRS})
-    target_link_libraries(pyfitparquet PRIVATE arrow_shared parquet_shared 
-        fitsdk Boost::filesystem Boost::python)
-
-else()
-
-    # Create pybind11 module
-    set(PYBIND11_PYTHON_VERSION ${Boost_PYTHON_VERSION})
-    set(pybind11_DIR "${CMAKE_INSTALL_PREFIX}/share/cmake/pybind11")
-    find_package(pybind11 CONFIG REQUIRED)
-    pybind11_add_module(pyfitparquet fitparquet.cc pyfitparquet.cc)
-    target_link_libraries(pyfitparquet PRIVATE arrow_shared parquet_shared
-        fitsdk Boost::filesystem pybind11::module pybind11::lto)
-
-endif()
+# Build the pyfitparquet module (uses pybind11)
+set(PYBIND11_PYTHON_VERSION ${Boost_PYTHON_VERSION})
+set(pybind11_DIR "${CMAKE_INSTALL_PREFIX}/share/cmake/pybind11")
+find_package(pybind11 CONFIG REQUIRED)
+pybind11_add_module(pyfitparquet fitparquet.cc pyfitparquet.cc)
+target_link_libraries(pyfitparquet PRIVATE arrow_shared parquet_shared
+    fitsdk Boost::filesystem pybind11::module pybind11::lto)
