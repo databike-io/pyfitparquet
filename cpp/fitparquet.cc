@@ -1,28 +1,25 @@
-#include "fitparquet.h"
-#include "config.h"
-
-#include "fit_unicode.hpp"
-#include "fit_mesg_broadcaster.hpp"
-
 #include <arrow/api.h>
 #include <arrow/io/api.h>
 #include <parquet/arrow/writer.h>
 
-// FPTransformer::fit_to_parquet is a static member function
-int FPTransformer::fit_to_parquet(const char fit_fname[], const char parquet_fname[]) {
-    FPTransformer transformer; // Single use object
-    return transformer._transform(fit_fname, parquet_fname);
-}
+#include "fit_unicode.hpp"
+#include "fit_mesg_broadcaster.hpp"
+
+#include "fitparquet.h"
+#include "config.h"
+
 
 FPTransformer::FPTransformer() : 
     time_created(FIT_DATE_TIME_INVALID), manufacturer_index(FIT_MANUFACTURER_INVALID),
-    product_index(FIT_UINT16_INVALID), colkeys{"fit_filename", "fit_file_uri", 
-    "manufacturer_index", "manufacturer_name", "product_index", "product_name", 
-    "timestamp", "mesg_index", "mesg_name", "field_index", "field_name", 
+    product_index(FIT_UINT16_INVALID), colkeys{"source_filetype", "source_filename", 
+    "source_file_uri", "manufacturer_index", "manufacturer_name", "product_index", 
+    "product_name", "timestamp", "mesg_index", "mesg_name", "field_index", "field_name", 
     "field_type", "value_string", "value_integer", "value_float", "units"} { }
 
-int FPTransformer::_transform(const char fit_fname[], const char parquet_fname[]) 
+int FPTransformer::fit_to_parquet(const char fit_fname[], const char parquet_fname[]) 
 {
+    int status = 1;
+
     try {
         // Open FIT file
         std::fstream fit_fhandle;
@@ -37,8 +34,8 @@ int FPTransformer::_transform(const char fit_fname[], const char parquet_fname[]
         
         // Record FIT filename/uri
         boost::filesystem::path pfit(fit_fname);
-        fit_filename = pfit.filename().string();
-        fit_file_uri = boost::filesystem::canonical(pfit).string();
+        source_filename = pfit.filename().string();
+        source_file_uri = boost::filesystem::canonical(pfit).string();
 
         // Finish process initialization
         fit::MesgBroadcaster msg_broadcaster;
@@ -48,10 +45,18 @@ int FPTransformer::_transform(const char fit_fname[], const char parquet_fname[]
         // Execute FIT-to-parquet serialization 
         fit_decoder.Read(fit_fhandle, msg_broadcaster);
         _write_parquet(parquet_fname);
-        return 0;
+        status = 0;
     }
     catch (const std::exception& e) { std::cerr << e.what() << std::endl; }
-    return 1;
+ 
+    _reset_state();
+    return status;
+}
+
+void FPTransformer::reset_from_config() {
+    CONFIG.reset();
+    colflags.clear(); excludeflags.clear(); builders.clear();
+    _init_from_config(colflags, excludeflags, builders);
 }
 
 void FPTransformer::OnMesg(fit::Mesg& mesg)
@@ -143,13 +148,17 @@ void FPTransformer::OnMesg(fit::Mesg& mesg)
 
 void FPTransformer::_append_mesg_fields(fit::Mesg& mesg) 
 {
-    if (colflags["fit_filename"])
+    if (colflags["source_filetype"])
         PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::StringBuilder>(
-            builders["fit_filename"])->Append(fit_filename));
+            builders["source_filetype"])->Append(std::string("FIT")));
 
-    if (colflags["fit_file_uri"])
+    if (colflags["source_filename"])
         PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::StringBuilder>(
-            builders["fit_file_uri"])->Append(fit_file_uri));
+            builders["source_filename"])->Append(source_filename));
+
+    if (colflags["source_file_uri"])
+        PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::StringBuilder>(
+            builders["source_file_uri"])->Append(source_file_uri));
 
     if (colflags["manufacturer_index"])
         PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::Int32Builder>(
@@ -303,8 +312,9 @@ void FPTransformer::_append_string(const std::string &sval)
 std::shared_ptr<arrow::Schema> FPTransformer::_get_schema() 
 {
     std::vector<std::shared_ptr<arrow::Field>> fldvec; // Last arg: true == nullable/optional, false == required
-    if (CONFIG["fit_filename"] == "true") fldvec.push_back(arrow::field("fit_filename", arrow::utf8(), false));
-    if (CONFIG["fit_file_uri"] == "true") fldvec.push_back(arrow::field("fit_file_uri", arrow::utf8(), false));
+    if (CONFIG["source_filetype"] == "true") fldvec.push_back(arrow::field("source_filetype", arrow::utf8(), false));
+    if (CONFIG["source_filename"] == "true") fldvec.push_back(arrow::field("source_filename", arrow::utf8(), false));
+    if (CONFIG["source_file_uri"] == "true") fldvec.push_back(arrow::field("source_file_uri", arrow::utf8(), false));
     if (CONFIG["manufacturer_index"] == "true") fldvec.push_back(arrow::field("manufacturer_index", arrow::int32(), false));
     if (CONFIG["manufacturer_name"] == "true") fldvec.push_back(arrow::field("manufacturer_name", arrow::utf8(), false));
     if (CONFIG["product_index"] == "true") fldvec.push_back(arrow::field("product_index", arrow::int32(), false));
@@ -325,8 +335,8 @@ std::shared_ptr<arrow::Schema> FPTransformer::_get_schema()
 }
 
 void FPTransformer::_init_from_config(std::unordered_map<std::string, bool> &cflags,
-                                        std::unordered_map<std::string, bool> &exflags,
-                                        std::unordered_map<std::string, pBuilder> &cbuilders) 
+                                      std::unordered_map<std::string, bool> &exflags,
+                                      std::unordered_map<std::string, pBuilder> &cbuilders) 
 {
     // Set exclude flags
     exflags.insert({"exclude_empty_values", CONFIG["exclude_empty_values"] == "true"});
@@ -336,8 +346,9 @@ void FPTransformer::_init_from_config(std::unordered_map<std::string, bool> &cfl
     for (int i = 0; i < colkeys.size(); ++i) cflags.insert({colkeys[i], CONFIG[colkeys[i]] == "true"});
 
     // Create column ArrayBuilders
-    if (cflags["fit_filename"]) cbuilders.insert({"fit_filename", pBuilder(new arrow::StringBuilder())});
-    if (cflags["fit_file_uri"]) cbuilders.insert({"fit_file_uri", pBuilder(new arrow::StringBuilder())});
+    if (cflags["source_filetype"]) cbuilders.insert({"source_filetype", pBuilder(new arrow::StringBuilder())});
+    if (cflags["source_filename"]) cbuilders.insert({"source_filename", pBuilder(new arrow::StringBuilder())});
+    if (cflags["source_file_uri"]) cbuilders.insert({"source_file_uri", pBuilder(new arrow::StringBuilder())});
     if (cflags["manufacturer_index"]) cbuilders.insert({"manufacturer_index", pBuilder(new arrow::Int32Builder())});
     if (cflags["manufacturer_name"]) cbuilders.insert({"manufacturer_name", pBuilder(new arrow::StringBuilder())});
     if (cflags["product_index"]) cbuilders.insert({"product_index", pBuilder(new arrow::Int32Builder())});
@@ -367,28 +378,38 @@ void FPTransformer::_write_parquet(const char parquet_fname[])
         }
     }
     
-    // Make arrays into table
-    std::shared_ptr<arrow::Table> atable_ptr = arrow::Table::Make(_get_schema(), tcolumns);
-
-    // Open and write table to parquet output file
+    // Make table from arrays, then write table to parquet outfile
     std::shared_ptr<::arrow::io::FileOutputStream> parquet_fhandle;
+    std::shared_ptr<arrow::Table> atable_ptr = arrow::Table::Make(_get_schema(), tcolumns);
     PARQUET_ASSIGN_OR_THROW(parquet_fhandle, ::arrow::io::FileOutputStream::Open(parquet_fname));
     PARQUET_THROW_NOT_OK(parquet::arrow::WriteTable(*atable_ptr, arrow::default_memory_pool(), 
                                                     parquet_fhandle, ROW_GROUP_SIZE));
+}
+
+// Note: does NOT re-parse config file
+void FPTransformer::_reset_state() {
+    time_created = FIT_DATE_TIME_INVALID;
+    manufacturer_index = FIT_MANUFACTURER_INVALID;
+    product_index = FIT_UINT16_INVALID;
+    source_filename.clear();
+    source_file_uri.clear();
+    manufacturer_name.clear();
+    product_name.clear();
+
+    for (auto bpair : builders) bpair.second->Reset();
 }
 
 int main(int argc, char* argv[])
 {
    int retstatus = 1;
    if (argc == 3) {
-        // FPTransformer transformer;
+        FPTransformer transformer;
         auto tstart = std::chrono::system_clock::now();
-        // retstatus = transformer.fit_to_parquet(argv[1], argv[2]);
-        retstatus = FPTransformer::fit_to_parquet(argv[1], argv[2]);
+        retstatus = transformer.fit_to_parquet(argv[1], argv[2]);
         std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now()-tstart;
-        if (retstatus == 0) std::cout << "Serialization completed in " 
+        if (retstatus == 0) std::cout << "Data transformation completed in " 
             << elapsed_seconds.count() << "sec" << std::endl;
    }
-   else std::cerr << "Usage: serializer <fitfile> <parquetfile>" << std::endl;
+   else std::cerr << "Usage: fitparquet <fitfile> <parquetfile>" << std::endl;
    return retstatus;
 }

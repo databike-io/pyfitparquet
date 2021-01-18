@@ -28,6 +28,12 @@ public:
         return single_instance;
     }
 
+    // Re-populate from config
+    bool reset() {
+        param_server.clear();
+        return populate_server();
+    }
+
     // Param value accessor
     std::string& operator[]( const std::string& param_k ) {
         std::unordered_map<std::string, std::string>::
@@ -70,7 +76,7 @@ public:
 
 private:
 
-    // Called on construction
+    // Called on construction and reset
     bool populate_server() {
         const path config_file = CONFIG_FILE_NAME;
         const path fit_ingest_root = REPO_ROOT_DIRECTORY;

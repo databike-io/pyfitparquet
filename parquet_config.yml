@@ -7,10 +7,11 @@
 #         Profile in https://developer.garmin.com/fit/protocol/)
 epoch_format: UNIX 
 
-# FIT file source data columns: containing filename
-# and/or full-path-uri (as best as ascertainable)
-fit_filename: true
-fit_file_uri: false
+# Source file meta data columns: file type (one of FIT: TCX)
+# filename, and full-path-uri (as best as ascertainable)
+source_filetype: false
+source_filename: true
+source_file_uri: false
 
 # FIT enumeration columns: containing numeric indexes and/or enumerated string names. Including
 # (at least) name or index for each category (manufacturer, product, mesg, and field) is suggested.

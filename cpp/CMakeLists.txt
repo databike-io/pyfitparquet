@@ -41,10 +41,10 @@ target_link_libraries(decoder PRIVATE fitsdk)
 add_executable(fitparquet fitparquet.cc)
 target_link_libraries(fitparquet PRIVATE arrow_shared parquet_shared Boost::filesystem fitsdk)
 
-# Build the pyfitparquet module (uses pybind11)
+# Build the pyfitparquet_so module (uses pybind11)
 set(PYBIND11_PYTHON_VERSION ${Boost_PYTHON_VERSION})
 set(pybind11_DIR "${CMAKE_INSTALL_PREFIX}/share/cmake/pybind11")
 find_package(pybind11 CONFIG REQUIRED)
-pybind11_add_module(pyfitparquet fitparquet.cc pyfitparquet.cc)
-target_link_libraries(pyfitparquet PRIVATE arrow_shared parquet_shared
+pybind11_add_module(pyfitparquet_so fitparquet.cc pyfitparquet_so.cc)
+target_link_libraries(pyfitparquet_so PRIVATE arrow_shared parquet_shared
     fitsdk Boost::filesystem pybind11::module pybind11::lto)

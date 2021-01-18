@@ -13,22 +13,23 @@ class FPTransformer : public fit::MesgListener
 {
 public:
 
-    // The public FIT => Parquet tranformation function uses fresh  
-    // FPTransformer object init'd from parquet_config.yml each call
-    static int fit_to_parquet(const char fit_fname[], const char parquet_fname[]);
-    
-    // Callback for fit::MesgBroadcaster
-    void OnMesg(fit::Mesg& mesg) override;
+    FPTransformer();
 
-    // Explicitly remove copy ctor and assignment
-    FPTransformer(FPTransformer const&)  = delete;
-    void operator=(FPTransformer const&) = delete;
+    // The public FIT => Parquet function (resets transformer on completion)
+    int fit_to_parquet(const char fit_fname[], const char parquet_fname[]);
+
+    // Re-parse configuration file
+    void reset_from_config();
+
+    // MesgListener callback override,
+    // meant for fit::MesgBroadcasters only
+    void OnMesg(fit::Mesg& mesg) override;
 
 private:
 
-    // Fit file name/uri
-    std::string fit_filename;
-    std::string fit_file_uri;
+    // Source file name/uri (type is always: FIT)
+    std::string source_filename;
+    std::string source_file_uri;
 
     // Fit file "primary-ish" key
     FIT_DATE_TIME time_created;
@@ -43,14 +44,10 @@ private:
     std::unordered_map<std::string, bool> excludeflags;
     std::unordered_map<std::string, pBuilder> builders;
 
-    // Private ctor
-    FPTransformer();
-
     // Generates schema based on parquet_config.yml
     std::shared_ptr<arrow::Schema> _get_schema();
 
-    // Internally used helper fncs 
-    int _transform(const char fit_fname[], const char parquet_fname[]);
+    // Internally used helper fncs
     void _init_from_config(std::unordered_map<std::string, bool> &cflags,
                            std::unordered_map<std::string, bool> &exflags,
                            std::unordered_map<std::string, pBuilder> &cbuilders);
@@ -61,6 +58,8 @@ private:
     void _append_integer(FIT_SINT64 ival);
     void _append_string(const std::string &sval);
     void _write_parquet(const char parquet_fname[]);
+    void _reset_state();
+
 };
 
 #endif // defined(FPTRANSFORMER_H)

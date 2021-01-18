@@ -12,6 +12,9 @@ dependencies:
   - thrift-cpp
   - pybind11
 
+  # For tcx file parsing
+  - defusedxml
+
   # For notebook tests
   - nodejs
   - jupyterlab
