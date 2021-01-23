@@ -123,14 +123,16 @@ private:
     void _parse_config_file(ifstream &config_fhandle) {
         std::string line;
         std::smatch matchobj;
+        std::regex rg_comment("\\s*\\#.*");
+        std::regex rg_parameter("\\s*(\\w+)\\s*:\\s*(\\w+).*");
+
         while (std::getline(config_fhandle, line))
         {
-            std::regex rg_comment("\\s*\\#.*");
+            // Strip comment lines
             if (std::regex_match(line, matchobj, rg_comment)) 
-                continue; // Strip comment lines
+                continue; 
 
-            // Matches param : value pairs
-            std::regex rg_parameter("\\s*(\\w+)\\s*:\\s*(\\w+).*");
+            // Match 'param : value' pairs
             if (std::regex_match(line, matchobj, rg_parameter))
                 param_server.insert({matchobj.str(1), matchobj.str(2)});
         }
