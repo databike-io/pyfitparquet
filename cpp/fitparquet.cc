@@ -214,6 +214,69 @@ void FPTransformer::_append_field_fields(const fit::FieldBase& field, const std:
             builders["units"])->Append(sunit));
     }
 
+    FIELD_TYPE ftype; FIT_SINT64 ival; FIT_FLOAT64 fval;
+    std::tie(ftype, ival, fval) = _get_field_type(field, sval, j);
+
+    switch (ftype) {
+    case FIELD_TYPE::INT_VALUE:
+        if (colflags["field_type"]) 
+            PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::StringBuilder>(
+                builders["field_type"])->Append("integer"));
+
+        if (colflags["value_integer"])
+            PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::Int64Builder>(
+                builders["value_integer"])->Append(ival));
+
+        if (colflags["value_float"])
+            PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::DoubleBuilder>(
+                builders["value_float"])->Append(fval));
+
+        if (colflags["value_string"]) 
+            PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::StringBuilder>(
+                builders["value_string"])->Append(sval));
+        break;
+
+    case FIELD_TYPE::FLOAT_VALUE:
+        if (colflags["field_type"]) 
+            PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::StringBuilder>(
+                builders["field_type"])->Append("float"));
+
+        if (colflags["value_integer"])
+            PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::Int64Builder>(
+                builders["value_integer"])->AppendNull());
+
+        if (colflags["value_float"])
+            PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::DoubleBuilder>(
+                builders["value_float"])->Append(fval));
+
+        if (colflags["value_string"]) 
+            PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::StringBuilder>(
+                builders["value_string"])->Append(sval));
+        break;
+    
+    case FIELD_TYPE::STRING_VALUE:
+    default:
+        if (colflags["field_type"]) 
+            PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::StringBuilder>(
+                builders["field_type"])->Append("string"));
+
+        if (colflags["value_integer"])
+            PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::Int64Builder>(
+                builders["value_integer"])->AppendNull());
+
+        if (colflags["value_float"])
+            PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::DoubleBuilder>(
+                builders["value_float"])->AppendNull());
+
+        if (colflags["value_string"]) 
+            PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::StringBuilder>(
+                builders["value_string"])->Append(sval));
+    }
+}
+
+std::tuple<FIELD_TYPE, FIT_SINT64, FIT_FLOAT64> FPTransformer::_get_field_type(
+    const fit::FieldBase& field, const std::string &sval, FIT_UINT8 j) {
+    
     switch (field.GetType()) 
     {
     case FIT_BASE_TYPE_ENUM:
@@ -231,81 +294,30 @@ void FPTransformer::_append_field_fields(const fit::FieldBase& field, const std:
     case FIT_BASE_TYPE_UINT32Z:
     case FIT_BASE_TYPE_UINT64Z:
     {
-        static double TINY_NUMBER = .00000001;
+        // True integer only if NO scale/offset  
+        // applied in fit::Field::GetFLOAT64Value
         FIT_FLOAT64 fval = field.GetFLOAT64Value(j);
         FIT_SINT64 ival = field.GetSINT64Value(j);
-
-        // True integer iff NO scale/offset applied in fit::Field::GetFLOAT64Value
-        if (colflags["value_integer"] && std::fabs(fval - ival) < TINY_NUMBER) 
-            _append_integer(ival); 
-        else _append_float(fval);
+        
+        static double TINY_NUMBER = .00000001;
+        if (std::fabs(fval - ival) < TINY_NUMBER) 
+            return std::make_tuple(FIELD_TYPE::INT_VALUE, ival, fval);
+        else return std::make_tuple(FIELD_TYPE::FLOAT_VALUE, ival, fval);
         break;
     }
 
     case FIT_BASE_TYPE_FLOAT32:
     case FIT_BASE_TYPE_FLOAT64:
-        _append_float(field.GetFLOAT64Value(j));
+        return std::make_tuple(FIELD_TYPE::FLOAT_VALUE, 0, field.GetFLOAT64Value(j));
         break;
 
     case FIT_BASE_TYPE_STRING:
-        _append_string(sval);
+        return std::make_tuple(FIELD_TYPE::STRING_VALUE, 0, 0.0);
         break;
     
-    default: std::cerr << "Invalid FIT field datatype: " << field.GetType() << std::endl;
-    }
-}
-
-void FPTransformer::_append_float(FIT_FLOAT64 fval) 
-{
-    if (colflags["value_float"]) {
-        PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::StringBuilder>(
-            builders["field_type"])->Append("float"));
-        PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::DoubleBuilder>(
-            builders["value_float"])->Append(fval));
-    }
-
-    if (colflags["value_integer"])
-        PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::Int64Builder>(
-            builders["value_integer"])->AppendNull());
-
-    if (colflags["value_string"]) 
-        PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::StringBuilder>(
-            builders["value_string"])->Append(std::to_string(fval)));
-}
-
-void FPTransformer::_append_integer(FIT_SINT64 ival) 
-{
-    if (colflags["value_float"])
-        PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::DoubleBuilder>(
-            builders["value_float"])->AppendNull());
-
-    if (colflags["value_integer"]) {
-        PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::StringBuilder>(
-            builders["field_type"])->Append("integer"));
-        PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::Int64Builder>(
-            builders["value_integer"])->Append(ival));
-    }
-
-    if (colflags["value_string"]) 
-        PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::StringBuilder>(
-            builders["value_string"])->Append(std::to_string(ival)));
-}
-
-void FPTransformer::_append_string(const std::string &sval) 
-{
-    if (colflags["value_float"])
-        PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::DoubleBuilder>(
-            builders["value_float"])->AppendNull());
-
-    if (colflags["value_integer"])
-        PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::Int64Builder>(
-            builders["value_integer"])->AppendNull());
-
-    if (colflags["value_string"]) {
-        PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::StringBuilder>(
-            builders["field_type"])->Append("string"));
-        PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::StringBuilder>(
-            builders["value_string"])->Append(sval));
+    default: 
+        std::cerr << "Invalid FIT field datatype: " << field.GetType() << std::endl;
+        return std::make_tuple(FIELD_TYPE::STRING_VALUE, 0, 0.0);
     }
 }
 

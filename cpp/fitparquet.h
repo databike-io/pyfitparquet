@@ -8,6 +8,7 @@
 #define ROW_GROUP_SIZE 20000
 
 typedef std::shared_ptr<arrow::ArrayBuilder> pBuilder;
+enum FIELD_TYPE { INT_VALUE, FLOAT_VALUE, STRING_VALUE };
 
 class FPTransformer : public fit::MesgListener
 {
@@ -52,14 +53,13 @@ private:
                            std::unordered_map<std::string, bool> &exflags,
                            std::unordered_map<std::string, pBuilder> &cbuilders);
 
+    std::tuple<FIELD_TYPE, FIT_SINT64, FIT_FLOAT64> _get_field_type(
+        const fit::FieldBase& field, const std::string &sval, FIT_UINT8 j);
+
     void _append_mesg_fields(fit::Mesg& mesg);
     void _append_field_fields(const fit::FieldBase& field, const std::string &sval, FIT_UINT8 j);
-    void _append_float(FIT_FLOAT64 fval);
-    void _append_integer(FIT_SINT64 ival);
-    void _append_string(const std::string &sval);
     void _write_parquet(const char parquet_fname[]);
     void _reset_state();
-
 };
 
 #endif // defined(FPTRANSFORMER_H)
