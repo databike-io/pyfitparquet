@@ -46,9 +46,11 @@ class TcxTransformer:
         self.source_file_uri = os.path.abspath(tcx_fname)
         self.init_from_config()
         
-        # Parse the TCX XML-tree recursively
-        xiter = ET.parse(tcx_fname).iter()        
-        self.recurse_tree(xiter)
+        # Parse the TCX XML-tree recursively 
+        # XML parse requires NO leading whitespace
+        with open(tcx_fname) as f_handle:
+            xmlstring = f_handle.read().lstrip()
+            self.recurse_tree(ET.fromstring(xmlstring).iter())
         
         # Write to parquet file
         table = {ck : self.cbuilders[ck] for ck in self.colkeys if ck in self.cbuilders}
