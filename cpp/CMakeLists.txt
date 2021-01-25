@@ -7,8 +7,8 @@ project(fit-ingest LANGUAGES CXX)
 # Break if Conda not setup/activated
 if(NOT DEFINED ENV{CONDA_DEFAULT_ENV})
     message( FATAL_ERROR "(Mini)Conda enviroment required" )
-elseif(NOT $ENV{CONDA_DEFAULT_ENV} STREQUAL "databike")
-    message( FATAL_ERROR "Conda environment: 'databike' must be activated" )
+elseif(NOT $ENV{CONDA_DEFAULT_ENV} STREQUAL "pyfitparquet")
+    message( FATAL_ERROR "Conda environment: 'pyfitparquet' must be activated" )
 endif()
 
 # Specify the C++ standard
@@ -37,14 +37,14 @@ target_include_directories(fitsdk PUBLIC "${FITSDK_VERSION}/cpp")
 add_executable(decoder "${FITSDK_VERSION}/cpp/examples/decode.cpp")
 target_link_libraries(decoder PRIVATE fitsdk)
 
-# Build fitparquet executable 
-add_executable(fitparquet fitparquet.cc)
-target_link_libraries(fitparquet PRIVATE arrow_shared parquet_shared Boost::filesystem fitsdk)
+# Build fittransformer executable 
+add_executable(fittransformer fittransformer.cc)
+target_link_libraries(fittransformer PRIVATE arrow_shared parquet_shared Boost::filesystem fitsdk)
 
-# Build the pyfitparquet_so module (uses pybind11)
+# Build the fittransformer_so module (uses pybind11)
 set(PYBIND11_PYTHON_VERSION ${Boost_PYTHON_VERSION})
 set(pybind11_DIR "${CMAKE_INSTALL_PREFIX}/share/cmake/pybind11")
 find_package(pybind11 CONFIG REQUIRED)
-pybind11_add_module(pyfitparquet_so fitparquet.cc pyfitparquet_so.cc)
-target_link_libraries(pyfitparquet_so PRIVATE arrow_shared parquet_shared
+pybind11_add_module(fittransformer_so fittransformer.cc fittransformer_so.cc)
+target_link_libraries(fittransformer_so PRIVATE arrow_shared parquet_shared
     fitsdk Boost::filesystem pybind11::module pybind11::lto)

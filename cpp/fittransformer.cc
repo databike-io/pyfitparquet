@@ -5,18 +5,18 @@
 #include "fit_unicode.hpp"
 #include "fit_mesg_broadcaster.hpp"
 
-#include "fitparquet.h"
+#include "fittransformer.h"
 #include "config.h"
 
 
-FPTransformer::FPTransformer() : 
+FitTransformer::FitTransformer() : 
     time_created(FIT_DATE_TIME_INVALID), manufacturer_index(FIT_MANUFACTURER_INVALID),
     product_index(FIT_UINT16_INVALID), colkeys{"source_filetype", "source_filename", 
     "source_file_uri", "manufacturer_index", "manufacturer_name", "product_index", 
     "product_name", "timestamp", "mesg_index", "mesg_name", "field_index", "field_name", 
     "field_type", "value_string", "value_integer", "value_float", "units"} { }
 
-int FPTransformer::fit_to_parquet(const char fit_fname[], const char parquet_fname[]) 
+int FitTransformer::fit_to_parquet(const char fit_fname[], const char parquet_fname[]) 
 {
     int status = 1;
 
@@ -53,13 +53,13 @@ int FPTransformer::fit_to_parquet(const char fit_fname[], const char parquet_fna
     return status;
 }
 
-void FPTransformer::reset_from_config() {
+void FitTransformer::reset_from_config() {
     CONFIG.reset();
     colflags.clear(); excludeflags.clear(); builders.clear();
     _init_from_config(colflags, excludeflags, builders);
 }
 
-void FPTransformer::OnMesg(fit::Mesg& mesg)
+void FitTransformer::OnMesg(fit::Mesg& mesg)
 {
     switch (mesg.GetNum()) {
         case FIT_MESG_NUM_INVALID:  
@@ -146,7 +146,7 @@ void FPTransformer::OnMesg(fit::Mesg& mesg)
     }
 }
 
-void FPTransformer::_append_mesg_fields(fit::Mesg& mesg) 
+void FitTransformer::_append_mesg_fields(fit::Mesg& mesg) 
 {
     if (colflags["source_filetype"])
         PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::StringBuilder>(
@@ -190,7 +190,7 @@ void FPTransformer::_append_mesg_fields(fit::Mesg& mesg)
             builders["mesg_name"])->Append(mesg.GetName()));
 }
 
-void FPTransformer::_append_field_fields(const fit::FieldBase& field, const std::string &sval, FIT_UINT8 j)
+void FitTransformer::_append_field_fields(const fit::FieldBase& field, const std::string &sval, FIT_UINT8 j)
 {
     if (colflags["field_index"]) {
         FIT_UINT16 field_index = field.GetNum();
@@ -274,7 +274,7 @@ void FPTransformer::_append_field_fields(const fit::FieldBase& field, const std:
     }
 }
 
-std::tuple<FIELD_TYPE, FIT_SINT64, FIT_FLOAT64> FPTransformer::_get_field_type(
+std::tuple<FIELD_TYPE, FIT_SINT64, FIT_FLOAT64> FitTransformer::_get_field_type(
     const fit::FieldBase& field, const std::string &sval, FIT_UINT8 j) {
     
     switch (field.GetType()) 
@@ -321,7 +321,7 @@ std::tuple<FIELD_TYPE, FIT_SINT64, FIT_FLOAT64> FPTransformer::_get_field_type(
     }
 }
 
-std::shared_ptr<arrow::Schema> FPTransformer::_get_schema() 
+std::shared_ptr<arrow::Schema> FitTransformer::_get_schema() 
 {
     std::vector<std::shared_ptr<arrow::Field>> fldvec; // Last arg: true == nullable/optional, false == required
     if (CONFIG["source_filetype"] == "true") fldvec.push_back(arrow::field("source_filetype", arrow::utf8(), false));
@@ -346,7 +346,7 @@ std::shared_ptr<arrow::Schema> FPTransformer::_get_schema()
     return p_schema;
 }
 
-void FPTransformer::_init_from_config(std::unordered_map<std::string, bool> &cflags,
+void FitTransformer::_init_from_config(std::unordered_map<std::string, bool> &cflags,
                                       std::unordered_map<std::string, bool> &exflags,
                                       std::unordered_map<std::string, pBuilder> &cbuilders) 
 {
@@ -378,7 +378,7 @@ void FPTransformer::_init_from_config(std::unordered_map<std::string, bool> &cfl
     if (cflags["units"]) cbuilders.insert({"units", pBuilder(new arrow::StringBuilder())});
 }
 
-void FPTransformer::_write_parquet(const char parquet_fname[]) 
+void FitTransformer::_write_parquet(const char parquet_fname[]) 
 {
     // Finish builders into arrays
     std::vector<std::shared_ptr<arrow::Array>> tcolumns;
@@ -399,7 +399,7 @@ void FPTransformer::_write_parquet(const char parquet_fname[])
 }
 
 // Note: does NOT re-parse config file
-void FPTransformer::_reset_state() {
+void FitTransformer::_reset_state() {
     time_created = FIT_DATE_TIME_INVALID;
     manufacturer_index = FIT_MANUFACTURER_INVALID;
     product_index = FIT_UINT16_INVALID;
@@ -415,7 +415,7 @@ int main(int argc, char* argv[])
 {
    int retstatus = 1;
    if (argc == 3) {
-        FPTransformer transformer;
+        FitTransformer transformer;
         auto tstart = std::chrono::system_clock::now();
         retstatus = transformer.fit_to_parquet(argv[1], argv[2]);
         std::chrono::duration<double> elapsed_seconds = std::chrono::system_clock::now()-tstart;

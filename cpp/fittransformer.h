@@ -1,5 +1,5 @@
-#if !defined(FPTRANSFORMER_H)
-#define FPTRANSFORMER_H
+#if !defined(FITTRANSFORMER_H)
+#define FITTRANSFORMER_H
 
 #include "fit.hpp"
 #include "fit_mesg_listener.hpp"
@@ -10,11 +10,11 @@
 typedef std::shared_ptr<arrow::ArrayBuilder> pBuilder;
 enum FIELD_TYPE { INT_VALUE, FLOAT_VALUE, STRING_VALUE };
 
-class FPTransformer : public fit::MesgListener
+class FitTransformer : public fit::MesgListener
 {
 public:
 
-    FPTransformer();
+    FitTransformer();
 
     // The public FIT => Parquet function (resets transformer on completion)
     int fit_to_parquet(const char fit_fname[], const char parquet_fname[]);
@@ -52,14 +52,13 @@ private:
     void _init_from_config(std::unordered_map<std::string, bool> &cflags,
                            std::unordered_map<std::string, bool> &exflags,
                            std::unordered_map<std::string, pBuilder> &cbuilders);
-
+    
     std::tuple<FIELD_TYPE, FIT_SINT64, FIT_FLOAT64> _get_field_type(
         const fit::FieldBase& field, const std::string &sval, FIT_UINT8 j);
-
     void _append_mesg_fields(fit::Mesg& mesg);
     void _append_field_fields(const fit::FieldBase& field, const std::string &sval, FIT_UINT8 j);
     void _write_parquet(const char parquet_fname[]);
     void _reset_state();
 };
 
-#endif // defined(FPTRANSFORMER_H)
+#endif // defined(FITTRANSFORMER_H)

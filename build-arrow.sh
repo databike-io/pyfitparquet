@@ -4,7 +4,7 @@ set -e
 
 THIS_SCRIPT=$(basename $0)
 if [ ! -f "$THIS_SCRIPT" ]; then
-    echo "ERROR: must execute this script from fit-ingest root directory"
+    echo "ERROR: must execute this script from pyfitparquet root directory"
     echo
     exit 1
 fi

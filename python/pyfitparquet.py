@@ -1,11 +1,14 @@
-import os, re, time
-from pyfitparquet_so import FPTransformer
+import sys, os, re, time, argparse
+if '../cpp/pyfit-build' not in sys.path: 
+    sys.path.append('../cpp/pyfit-build')
+from fittransformer_so import FitTransformer
 from tcxtransformer import TcxTransformer
+
 
 class PyFitParquet:
 #{
     def __init__(self):
-        self.fit_transformer = FPTransformer()
+        self.fit_transformer = FitTransformer()
         self.tcx_transformer = TcxTransformer()
     
     # Serializes all fit/tcx files in data_dir, outputs into
@@ -43,4 +46,24 @@ class PyFitParquet:
     
     def tcx_to_parquet(self, tcx_fname, parquet_fname):
         return self.tcx_transformer.tcx_to_parquet(tcx_fname, parquet_fname)
+
+    def reset_from_config(self):
+        self.fit_transformer.reset_from_config()
+        self.tcx_transformer.reset_from_config()
+#}
+
+
+if __name__ == "__main__":
+#{
+    parser = argparse.ArgumentParser()
+    parser.add_argument('DATA_DIR', help='source dir of .fit/.tcx files')
+    parser.add_argument('-P', metavar='PARQUET_DIR', help='parquet output dir (defaults: ${DATA_DIR}/parquet')
+    args = parser.parse_args()
+
+    PARQUET_DIR = args.P if args.P else f'{args.DATA_DIR}/parquet'
+    try: os.mkdir(PARQUET_DIR) 
+    except FileExistsError: pass
+
+    pyfitparq = PyFitParquet()
+    pyfitparq.data_to_parquet(args.DATA_DIR, PARQUET_DIR)
 #}
