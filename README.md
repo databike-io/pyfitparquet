@@ -25,7 +25,7 @@ ___
 Please see notebook [SerializationTest.ipynb](https://github.com/databike-io/pyfitparquet/blob/main/notebooks/SerializationTest.ipynb) to test FIT/TCX-to-parquet serialization functionality. Or you can run from the command-line as below. To serialize FIT/TCX files to parquet from command-line:
 ```
 $ cd ./python
-$ python pyfitparquet.py <DATA_DIR> --parque_dir <PARQUET_DIR> 
+$ python pyfitparquet.py <DATA_DIR> -P <PARQUET_DIR> 
 ```
 
 (See [pyfitparquet.py](https://github.com/databike-io/pyfitparquet/blob/main/python/pyfitparquet.py) for more nuanced usage) To use C++ executables directly from the command-line to serialize a single FIT-file to parquet:
@@ -43,12 +43,12 @@ $ decoder <FIT_FILE>
 ___
 ### TODOs:
 
+- **X** Add Garmin XSD schemas to the repo
+- **X** Create complete compound tag mapping (and generate-script) from XSD
+- **X** Download and test against all TCX files in https://github.com/cjoakim/ggps/tree/master/data
+- **X** Add API controllable parquet_config.yml parameters (maybe?) (**cancelled - requiring config file manipulation from USER and address w/consistent pip/conda install location, this also addresses PYTHONPATH variablity too**)
 - Add C++ cout/cerr logging redirects to python sys.stdout, sys.stderr 
 - Licensing?? Need to address and add disclaimer comments to src files
-- Add Garmin XSD schemas to the repo
-- Create complete compound tag mapping (and generate-script) from XSD
-- Download and test against all TCX files in https://github.com/cjoakim/ggps/tree/master/data
 - Implement a more definitive pytest sequence
-- Add API controllable parquet_config.yml parameters (maybe?)
 - Create mkdocs page describing python and C++ API (and update repo README)
 - Finalize pip/conda packaging and build procedure
