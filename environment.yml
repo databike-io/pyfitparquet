@@ -1,26 +1,20 @@
-name: pyfitparquet
+name: pyfitenv
 channels:
   - conda-forge
 
 dependencies:
   - python==3.8
   - cmake
-  - snappy
-  - libutf8proc
-  - boost
-  - boost-cpp
-  - thrift-cpp
+  - arrow-cpp
   - pybind11
-
-  # For tcx file parsing
   - defusedxml
+  - setuptools
+  - mkdocs
 
   # For notebook tests
   - nodejs
   - jupyterlab
   - pandas
   - openjdk
-  - pip
-  - pip:
-    - pyarrow
-    - pyspark
+  - pyarrow
+  - pyspark

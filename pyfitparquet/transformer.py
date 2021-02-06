@@ -1,15 +1,12 @@
-import sys, os, re, time, argparse
-if '../cpp/pyfit-build' not in sys.path: 
-    sys.path.append('../cpp/pyfit-build')
-from fittransformer_so import FitTransformer
-from tcxtransformer import TcxTransformer
+import os, re, time, argparse
+from pyfitparquet import fittransformer_so, tcxtransformer
 
 
 class PyFitParquet:
 #{
     def __init__(self):
-        self.fit_transformer = FitTransformer()
-        self.tcx_transformer = TcxTransformer()
+        self.fit_transformer = fittransformer_so.FitTransformer()
+        self.tcx_transformer = tcxtransformer.TcxTransformer()
     
     # Serializes all fit/tcx files in data_dir, outputs into
     # parquet_dir, which defaults to subdirectory within data_dir

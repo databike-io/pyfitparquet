@@ -1,43 +1,34 @@
-## Project: PyFitParquet
+## PyFitParquet
 
 Perform Garmin FIT/TCX file serialization to parquet format.
-
-![sysdesign](https://github.com/databike-io/pyfitparquet/blob/main/sysdesign_v1.jpg)
 
 ___
 
 ### Installation and Build:
 
-Two build scripts are provided to be run in order: first [build-arrow.sh](https://github.com/databike-io/pyfitparquet/blob/main/build-arrow.sh), which will clone Apache Arrow (if needed), then build and install it (in *./arrow/cpp/arrow-build* and *./arrow/cpp/arrow-install*). The second: [build-pyfitparquet.sh](https://github.com/databike-io/pyfitparquet/blob/main/build-pyfitparquet.sh) will build (in *./cpp/pyfit-build*) the FitSDK libary, two executables: **decoder** (provided w/FitSDK [decoder.cpp](https://github.com/databike-io/pyfitparquet/blob/main/cpp/FitCppSDK_21.40.00/cpp/examples/decode.cpp)) and **fittransformer** ([fittransformer.cc](https://github.com/databike-io/pyfitparquet/blob/main/cpp/fittransformer.cc)), and a python module: **fittransformer_so** ([fittransformer_so.cc](https://github.com/databike-io/pyfitparquet/blob/main/cpp/fittransformer_so.cc)). The **decoder** prints the contents of a FIT file to stdout, while **fittransformer** performs transformation of FIT files to parquet files, **fittransformer_so** provides the same functionality from python. You can clean the build by deleting *./cpp/pyfit-build*, *./arrow/cpp/arrow-build*, *./arrow/cpp/arrow-install*, or *./arrow* entirely.
+The suggested build method is to simply install with ```pip``` and the necessary libs/modules will be built implicitly and installed into your conda environment. Please use [uninstall.sh](https://github.com/databike-io/pyfitparquet/blob/main/uninstall.sh) to remove all components (just using ```pip uninstall pyfitenv``` is not sufficient to removal all components). Upon install completion the **pyfitparquet** module will be accessible for import. Please see [SerializationTest.ipynb](https://github.com/databike-io/pyfitparquet/blob/main/notebooks/SerializationTest.ipynb) notebook for usage examples. Also installed in $CONDA_PREFIX/bin are two executables: **fitdecoder** (provided w/FitSDK [decoder.cpp](https://github.com/databike-io/pyfitparquet/blob/main/cpp/FitCppSDK_21.40.00/cpp/examples/decode.cpp)) and **fittransformer** ([fittransformer.cc](https://github.com/databike-io/pyfitparquet/blob/main/cpp/fittransformer.cc)), which print the contents of a FIT file to stdout, and perform transformation of FIT files to parquet, respectively.
 
 ```
 $ git clone https://github.com/databike-io/pyfitparquet.git
 $ cd pyfitparquet
-$ conda env create -f pyfitparquet.yml
-$ conda activate pyfitparquet
-$ ./build-arrow.sh
-$ ./build-pyfitparquet.sh
+$ conda env create -f environment.yml
+$ conda activate pyfitenv
+$ pip install .
 ```
 
 ___
 ### Execution:
 
-Please see notebook [SerializationTest.ipynb](https://github.com/databike-io/pyfitparquet/blob/main/notebooks/SerializationTest.ipynb) to test FIT/TCX-to-parquet serialization functionality. Or you can run from the command-line as below. To serialize FIT/TCX files to parquet from command-line:
+Please see notebook [SerializationTest.ipynb](https://github.com/databike-io/pyfitparquet/blob/main/notebooks/SerializationTest.ipynb) for Python FIT/TCX-to-parquet serialization examples. To use C++ executables directly from the command-line to serialize a single FIT-file to parquet:
 ```
-$ cd ./python
-$ python pyfitparquet.py <DATA_DIR> -P <PARQUET_DIR> 
-```
-
-(See [pyfitparquet.py](https://github.com/databike-io/pyfitparquet/blob/main/python/pyfitparquet.py) for more nuanced usage) To use C++ executables directly from the command-line to serialize a single FIT-file to parquet:
-```
-$ cd cpp/pyfit-build
+$ cd $CONDA_PREFIX/bin
 $ fittransformer <FIT_FILE> <PARQUET_FILE>
 ```
 
 Or to decode a single FIT-file to stdout:
 ```
-$ cd cpp/pyfit-build
-$ decoder <FIT_FILE>
+$ cd $CONDA_PREFIX/bin
+$ fitdecoder <FIT_FILE>
 ```
 
 ___
@@ -47,8 +38,9 @@ ___
 - **X** Create complete compound tag mapping (and generate-script) from XSD
 - **X** Download and test against all TCX files in https://github.com/cjoakim/ggps/tree/master/data
 - **X** Add API controllable parquet_config.yml parameters (maybe?) (**cancelled - requiring config file manipulation from USER and address w/consistent pip/conda install location, this also addresses PYTHONPATH variablity too**)
+- **X** Implement pip/conda packaging and build procedure
 - Add C++ cout/cerr logging redirects to python sys.stdout, sys.stderr 
 - Licensing?? Need to address and add disclaimer comments to src files
 - Implement a more definitive pytest sequence
 - Create mkdocs page describing python and C++ API (and update repo README)
-- Finalize pip/conda packaging and build procedure
+- Create conda-forge meta.yaml recipe and submit for public download 

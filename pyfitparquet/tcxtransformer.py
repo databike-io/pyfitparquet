@@ -1,7 +1,7 @@
 import os, re
 import pandas as pd
 import defusedxml.ElementTree as ET
-import loadconfig, mappings
+from pyfitparquet import loadconfig, mappings_config
 
 class TcxTransformer:
 #{
@@ -104,7 +104,7 @@ class TcxTransformer:
             nfields += self.append_endpoint(attrcomptag, xnode.attrib[attr])
 
         # Append valid XML values
-        if compoundtag in mappings.TAG_FIELD_MAP: 
+        if compoundtag in mappings_config.TAG_FIELD_MAP: 
             nfields += self.append_endpoint(compoundtag, xnode.text.rstrip())
 
         # Traverse child tags
@@ -112,7 +112,7 @@ class TcxTransformer:
             nfields += self.recurse_tree(xiter, compoundtag)
 
         # Finalize timestamp if finishing mesg block of rows
-        if tagname in mappings.MESG_TAGS and "timestamp" in self.cbuilders: 
+        if tagname in mappings_config.MESG_TAGS and "timestamp" in self.cbuilders: 
             self.cbuilders["timestamp"].extend([self.timestamp]*nfields)
             return 0
             
@@ -122,24 +122,24 @@ class TcxTransformer:
     # Append XML comptag-endpoint to column builder arrays
     def append_endpoint(self, comptag, field_value):
     #{
-        if comptag in mappings.TAG_FIELD_MAP:
+        if comptag in mappings_config.TAG_FIELD_MAP:
         #{
             # Update manufacturer/product info
             if comptag in self.file_id_tags:
                 self.file_id_tags[comptag](field_value)
         
             # Update timestamp
-            mesg_name, field_name, units = mappings.TAG_FIELD_MAP[comptag]
-            if comptag in mappings.TIMESTAMP_TAGS: 
+            mesg_name, field_name, units = mappings_config.TAG_FIELD_MAP[comptag]
+            if comptag in mappings_config.TIMESTAMP_TAGS: 
                 self.timestamp = pd.to_datetime(field_value).tz_localize(None)
 
             # Append field
-            if (comptag not in mappings.TIMESTAMP_TAGS and not
+            if (comptag not in mappings_config.TIMESTAMP_TAGS and not
                 self.excludeflags["exclude_timestamp_values"]):
                 self.append_fields(mesg_name, field_name, field_value, units)
                 return 1
         #}
-        elif field_value and comptag not in mappings.TAG_FIELD_EXCLUDES: 
+        elif field_value and comptag not in mappings_config.TAG_FIELD_EXCLUDES: 
             print(f"WARNING unmapped endpoint: '{comptag}' with value: {field_value} (see mapping.py)")
         
         return 0

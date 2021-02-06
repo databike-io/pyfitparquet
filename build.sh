@@ -10,18 +10,17 @@ if [ ! -f "$THIS_SCRIPT" ]; then
 fi
 
 : ${PYFITPARQUET_ROOT:=${PWD}}
-: ${ARROW_CPP:=${PYFITPARQUET_ROOT}/arrow/cpp}
-: ${ARROW_INSTALL:=${ARROW_CPP}/arrow-install}
+: ${PYFIT_INSTALL:=${PYFITPARQUET_ROOT}/pyfit-install}
 
 echo
 echo "=="
-echo "== Building FIT lib, decoder, and fittransformer"
+echo "== Building FIT lib, fitdecoder, and fittransformer"
 echo "=="
 echo
 
-cd $PYFITPARQUET_ROOT/cpp
-cmake -H. -Bpyfit-build \
+cmake -Spyfitparquet/cpp -Bpyfit-build \
     -DCMAKE_PREFIX_PATH=${CONDA_PREFIX} \
-    -DCMAKE_INSTALL_PREFIX=${ARROW_INSTALL}
-
+    -DCMAKE_INSTALL_PREFIX=${PYFIT_INSTALL} \
+    -DINSTALL_SITE_PKGS=${PYFIT_INSTALL}
 cmake --build pyfit-build
+

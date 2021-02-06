@@ -9,10 +9,10 @@ if [ ! -f "$THIS_SCRIPT" ]; then
     exit 1
 fi
 
-: ${FIT_INGEST_ROOT:=${PWD}}
-: ${ARROW_CPP:=${FIT_INGEST_ROOT}/arrow/cpp}
+: ${PYFITPARQUET_ROOT:=${PWD}}
+: ${ARROW_CPP:=${PYFITPARQUET_ROOT}/arrow/cpp}
 : ${ARROW_INSTALL:=${ARROW_CPP}/arrow-install}
-: ${ARROW_PYTHON:=${FIT_INGEST_ROOT}/arrow/python}
+: ${ARROW_PYTHON:=${PYFITPARQUET_ROOT}/arrow/python}
 
 if [ ! -d "$ARROW_CPP" ]; then
     echo
