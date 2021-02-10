@@ -12,9 +12,6 @@
 #include "boost/filesystem.hpp"
 using namespace boost::filesystem;
 
-#define CONFIG_FILE_NAME "parquet_config.yml"
-#define REPO_ROOT_DIRECTORY "fit-ingest"
-
 #define CONFIG Config::getInstance()
 
 
@@ -78,28 +75,30 @@ private:
 
     // Called on construction and reset
     bool populate_server() {
-        const path config_file = CONFIG_FILE_NAME;
-        const path fit_ingest_root = REPO_ROOT_DIRECTORY;
+        path parquet_config, parquet_config_base;
+        char *conda_prefix_env = std::getenv("CONDA_PREFIX");
+        char *pyfit_config_env = std::getenv("PYFIT_CONFIG_DIR");
 
-        // Can find CONFIG_FILE_NAME (if exists) 
-        // anywhere within REPO_ROOT_DIRECTORY
-        path start_dir = ".";
-        path config_uri, stop_path;
-        bool found = false, stop = false;
-        while (!found && !stop) {
-            start_dir /= "..";
-            found = _find_file(start_dir, config_file, config_uri);
-            stop = _find_file(start_dir, fit_ingest_root, stop_path);
+        bool found = false;
+        if (pyfit_config_env) {
+            parquet_config = std::string(pyfit_config_env).append("/parquet_config.yml");
+            found = boost::filesystem::exists(parquet_config);
         }
 
+        if (!found && conda_prefix_env) {
+            found = _find_file(conda_prefix_env, "parquet_config.yml", parquet_config_base);
+            if (found && pyfit_config_env) copy_file(parquet_config_base, parquet_config);
+            else if (found) parquet_config = parquet_config_base;
+        }
+        
         if (!found) {
-            std::cerr << "ERROR: unable to find " << config_file << std::endl;
+            std::cerr << "ERROR: unable to find: parquet_config.yml" << std::endl;
             return false;
         }
-
-        ifstream config_fhandle(config_uri);
+        
+        ifstream config_fhandle(parquet_config);
         if (!config_fhandle.is_open()) {
-            std::cerr << "ERROR: unable to open " << config_uri << std::endl; 
+            std::cerr << "ERROR: unable to open: " << parquet_config << std::endl; 
             return false;
         }
 

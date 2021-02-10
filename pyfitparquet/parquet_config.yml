@@ -7,7 +7,7 @@
 #         Profile in https://developer.garmin.com/fit/protocol/)
 epoch_format: UNIX 
 
-# Source file meta data columns: file type (one of FIT: TCX)
+# Source file meta data columns: filetype (FIT or TCX),
 # filename, and full-path-uri (as best as ascertainable)
 source_filetype: false
 source_filename: true
@@ -30,9 +30,9 @@ units: true
 
 # Field value columns: best attempt is made to respect original FIT data type (w/some caveats, see 
 # FIT field application of scale/offset in https://developer.garmin.com/fit/protocol/). Note that
-# if set, the value_string column will be assigned data translations of both numeric/string fields.
-# Note: if opening parquet file with pandas, an integer column (w/nulls) will be converted to float,
-# see: https://stackoverflow.com/questions/53327973/pandas-converting-null-int64-to-float64
+# if set, the value_string column will be assigned data translations of both numeric and string fields.
+# Note: if opening parquet file with pandas, an integer column with nulls will be converted to float
+# in dataframe: https://stackoverflow.com/questions/53327973/pandas-converting-null-int64-to-float64
 value_string: true
 value_integer: false
 value_float: true

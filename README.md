@@ -6,7 +6,7 @@ ___
 
 ### Installation and Build:
 
-The suggested build method is to simply install with ```pip``` and the necessary libs/modules will be built implicitly and installed into your conda environment. Please use [uninstall.sh](https://github.com/databike-io/pyfitparquet/blob/main/uninstall.sh) to remove all components (just using ```pip uninstall pyfitenv``` is not sufficient to removal all components). Upon install completion the **pyfitparquet** module will be accessible for import. Please see [SerializationTest.ipynb](https://github.com/databike-io/pyfitparquet/blob/main/notebooks/SerializationTest.ipynb) notebook for usage examples. Also installed in $CONDA_PREFIX/bin are two executables: **fitdecoder** (provided w/FitSDK [decoder.cpp](https://github.com/databike-io/pyfitparquet/blob/main/cpp/FitCppSDK_21.40.00/cpp/examples/decode.cpp)) and **fittransformer** ([fittransformer.cc](https://github.com/databike-io/pyfitparquet/blob/main/cpp/fittransformer.cc)), which print the contents of a FIT file to stdout, and perform transformation of FIT files to parquet, respectively.
+The suggested build method is to simply ```pip install```. The package will be built implicitly and installed into your conda environment. Upon completion the **pyfitparquet** module will be accessible for import. Please see [SerializationTest.ipynb](https://github.com/databike-io/pyfitparquet/blob/main/notebooks/SerializationTest.ipynb) for usage examples. Also installed in ```${CONDA_PREFIX}/bin``` are two C++ executables that can be run from the command-line: **fitdecoder** ([decoder.cpp](https://github.com/databike-io/pyfitparquet/blob/main/cpp/FitCppSDK_21.40.00/cpp/examples/decode.cpp) provided w/the FitSDK), which prints the contents of a FIT file to stdout, and **fittransformer** ([fittransformer.cc](https://github.com/databike-io/pyfitparquet/blob/main/cpp/fittransformer.cc)), which transforms a FIT file to parquet. Please use [uninstall.sh](https://github.com/databike-io/pyfitparquet/blob/main/uninstall.sh) if you want to remove the **pyfitparquet** package (just using ```pip uninstall pyfitenv``` is not sufficient to remove all components). Thus to install:
 
 ```
 $ git clone https://github.com/databike-io/pyfitparquet.git
@@ -15,6 +15,11 @@ $ conda env create -f environment.yml
 $ conda activate pyfitenv
 $ pip install .
 ```
+
+___
+### Configuration Files:
+
+Two (well-commented) configuration files are installed to fine-tune serialization behavior: [parquet_config.yml](https://github.com/databike-io/pyfitparquet/blob/main/pyfitparquet/parquet_config.yml) and [mappings_config.yml](https://github.com/databike-io/pyfitparquet/blob/main/pyfitparquet/mappings_config.yml). These files can be modified in-place directly at ```${CONDA_PREFIX}/lib/pythonX.X/site-packages/pyfitparquet```, however any re-installation of **pyfitparquet** will overwrite your changes. To maintain your own persistent copies, set the environment variable: ```PYFIT_CONFIG_DIR``` to a directory path of your choice and place local versions of the files there. These files will not be overwritten or removed on uninstall. (Note: if ```PYFIT_CONFIG_DIR``` is set, but **pyfitparquet** cannot find config files there, it will copy in default versions of the files from the current installation.)
 
 ___
 ### Execution:
