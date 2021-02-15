@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="None">
+  
+  
+  <link rel="shortcut icon" href="img/favicon.ico">
+  <title>PyFitParquet</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700|Roboto+Slab:400,700|Inconsolata:400,700" />
+
+  <link rel="stylesheet" href="css/theme.css" />
+  <link rel="stylesheet" href="css/theme_extra.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/github.min.css" />
+  
+  <script>
+    // Current page data
+    var mkdocs_page_name = "PyFitParquet";
+    var mkdocs_page_input_path = "index.md";
+    var mkdocs_page_url = null;
+  </script>
+  
+  <script src="js/jquery-2.1.1.min.js" defer></script>
+  <script src="js/modernizr-2.8.3.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>hljs.initHighlightingOnLoad();</script> 
+  
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side stickynav">
+    <div class="wy-side-scroll">
+      <div class="wy-side-nav-search">
+        <a href="." class="icon icon-home"> PyFitParquet</a>
+        <div role="search">
+  <form id ="rtd-search-form" class="wy-form" action="./search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" title="Type search term here" />
+  </form>
+</div>
+      </div>
+
+      <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+                <ul class="current">
+                    <li class="toctree-l1 current"><a class="reference internal current" href=".">PyFitParquet</a>
+    <ul class="current">
+    <li class="toctree-l2"><a class="reference internal" href="#python-code-example">Python Code Example</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#building-from-source">Building from Source</a>
+    </li>
+    <li class="toctree-l2"><a class="reference internal" href="#cli-usage">CLI Usage:</a>
+    </li>
+    </ul>
+                    </li>
+                </ul>
+      </div>
+    </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+        <a href=".">PyFitParquet</a>
+      </nav>
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="breadcrumbs navigation">
+  <ul class="wy-breadcrumbs">
+    <li><a href=".">Docs</a> &raquo;</li>
+    
+      
+    
+    <li>PyFitParquet</li>
+    <li class="wy-breadcrumbs-aside">
+      
+    </li>
+  </ul>
+  
+  <hr/>
+</div>
+          <div role="main">
+            <div class="section">
+              
+                <h2 id="overview">Overview</h2>
+<p>The <code>conda-forge::pyfitparquet</code> package provides ETL support for Garmin <a href="https://developer.garmin.com/fit/overview/">FIT</a> and <a href="https://en.wikipedia.org/wiki/Training_Center_XML">TCX</a> files into <a href="https://parquet.apache.org/">Apache Parquet</a> columnar format. Two configuration files are used to fine-tune ETL behavior: <a href="https://github.com/databike-io/pyfitparquet/blob/main/pyfitparquet/parquet_config.yml">parquet_config.yml</a> and <a href="https://github.com/databike-io/pyfitparquet/blob/main/pyfitparquet/mapping_config.yml">mapping_config.yml</a>. In general, these files control, respectively, the column and row structure of parquet output files, and the mapping of XML tag names (in TCX files) to the parquet field_name column. Please see verbose comments within the configuration files themselves for greater understanding of their use.</p>
+<p>Though the configuration files can be modified directly in-place in your conda environment (under <code>$CONDA_PREFIX</code> install tree), any re-installation of <code>pyfitparquet</code> will revert your changes to the defaults. To maintain a persistent configuration across installations, set the <code>PYFIT_CONFIG_DIR</code> environment variable to a directory path of your choice and place local versions of the files there. These files will not be overwritten or removed on uninstall. (Note: if <code>PYFIT_CONFIG_DIR</code> is set, but <code>pyfitparquet</code> cannot find the configuration files there, it will copy in default versions of the files from the current conda <code>pyfitparquet</code> installation.)</p>
+<hr />
+<h3 id="python-code-example">Python Code Example</h3>
+<pre><code class="language-python">import os, shutil, yaml, pandas, pyarrow
+from pyfitparquet import transformer
+
+# Source and output file locations
+DATA_DIR, OUTPUT_DIR = './tests/fixtures', './tmp_output'
+if not os.path.exists(OUTPUT_DIR): os.mkdir(OUTPUT_DIR)
+
+# Keep local copies of configuration files
+os.environ['PYFIT_CONFIG_DIR'] = OUTPUT_DIR
+
+# Serialize all FIT/TCX files in DATA_DIR to parquet
+pyfitparq = transformer.PyFitParquet()
+pyfitparq.data_to_parquet(DATA_DIR, parquet_dir=OUTPUT_DIR)
+
+# Display 
+df_fit = pandas.read_parquet('tmp_output/Who_Dares_Sufferfest.parquet', engine='pyarrow')
+df_tcx = pandas.read_parquet('tmp_output/45_min_Power_Zone_Ride.parquet', engine='pyarrow')
+print('Displaying: tmp_output/Who_Dares_Sufferfest.parquet\n', df_fit)
+print('Displaying: tmp_output/45_min_Power_Zone_Ride.parquet\n', df_tcx)
+
+# Make a configuration file change
+local_config_file = 'tmp_output/parquet_config.yml'
+local_config_file_tmp = 'tmp_output/parquet_config.yml.tmp'
+with open(local_config_file) as read_fhandle:
+#{
+    pconfig_map = yaml.safe_load(read_fhandle)
+    pconfig_map['epoch_format'] = 'FIT'
+    pconfig_map['source_filetype'] = True
+    pconfig_map['source_filename'] = False
+
+    with open(local_config_file_tmp, 'w') as write_fhandle:
+        yaml.safe_dump(pconfig_map, write_fhandle)
+#}
+
+shutil.move(local_config_file_tmp, local_config_file)
+pyfitparq.reset_from_config()
+
+# Serialize single FIT/TCX file to parquet
+pyfitparq.source_to_parquet('tests/fixtures/Who_Dares_Sufferfest.fit', parquet_dir=OUTPUT_DIR)
+pyfitparq.source_to_parquet('tests/fixtures/45_min_Power_Zone_Ride.tcx', parquet_dir=OUTPUT_DIR)
+
+# Display 
+df_fit = pandas.read_parquet('tmp_output/Who_Dares_Sufferfest.parquet', engine='pyarrow')
+df_tcx = pandas.read_parquet('tmp_output/45_min_Power_Zone_Ride.parquet', engine='pyarrow')
+print('Displaying: tmp_output/Who_Dares_Sufferfest.parquet\n', df_fit)
+print('Displaying: tmp_output/45_min_Power_Zone_Ride.parquet\n', df_tcx)
+</code></pre>
+<hr />
+<h3 id="building-from-source">Building from Source</h3>
+<p>The suggested method to build from source is to use <code>pip</code>, which will build libraries implicitly and install them into a conda environment. In addition to installation of the python module, two CLI executables are installed: <strong>fitdecoder</strong>, which prints the contents of a FIT file to std::cout, and <strong>fittransformer</strong>, which performs a FIT-to-Parquet file ETL. Thus to build and install:</p>
+<pre><code>$ git clone https://github.com/databike-io/pyfitparquet.git
+$ cd pyfitparquet
+$ conda env create -f environment.yml
+$ conda activate pyfitenv
+$ pip install .
+</code></pre>
+<p>Please use the provided <a href="https://github.com/databike-io/pyfitparquet/blob/main/uninstall.sh">uninstall.sh</a> if you want to remove the <code>pyfitparquet</code> package (just using <code>pip uninstall pyfitenv</code> is <strong>not</strong> sufficient to remove all components). </p>
+<hr />
+<h3 id="cli-usage">CLI Usage:</h3>
+<p>To use CLI executables ETL a single FIT-file to Parquet-file (does <strong>not</strong> support TCX files):</p>
+<pre><code>$ fittransformer &lt;FIT_FILE_URI&gt; &lt;PARQUET_FILE_URI&gt; 
+</code></pre>
+<p>To decode a single FIT-file to std::cout (default functionality provided by Garmin CPP FitSDK):</p>
+<pre><code>$ fitdecoder &lt;FIT_FILE_URI&gt; 
+</code></pre>
+<p>To ETL TCX (or FIT) file to Parquet-file using the Python interface:</p>
+<pre><code>python pyfitparquet/transformer.py &lt;SOURCE_FILE_URI&gt; [-P PARQUET_DIR] 
+</code></pre>
+              
+            </div>
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <!-- Copyright etc -->
+    
+  </div>
+
+  Built with <a href="https://www.mkdocs.org/">MkDocs</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>.
+</footer>
+      
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+
+  <div class="rst-versions" role="note" aria-label="versions">
+    <span class="rst-current-version" data-toggle="rst-current-version">
+      
+      
+      
+    </span>
+</div>
+    <script>var base_url = '.';</script>
+    <script src="js/theme.js" defer></script>
+      <script src="search/main.js" defer></script>
+    <script defer>
+        window.onload = function () {
+            SphinxRtdTheme.Navigation.enable(true);
+        };
+    </script>
+
+</body>
+</html>
+
+<!--
+MkDocs version : 1.1.2
+Build Date UTC : 2021-02-15 04:54:13.882291+00:00
+-->
