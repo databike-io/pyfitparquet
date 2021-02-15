@@ -9,6 +9,8 @@ class TcxTransformer:
     FLOAT_VALUE = 2
     STRING_VALUE = 3
 
+    UNIX_FIT_OFFSET = pd.Timedelta(value=631065600, unit='seconds')
+
     def __init__(self):
     #{
         # TCX source file name/uri
@@ -24,6 +26,7 @@ class TcxTransformer:
         self.product_name = None
         
         # CONFIG dependant
+        self.epoch_time = None
         self.cbuilders = None
         self.excludeflags = None
         
@@ -66,6 +69,7 @@ class TcxTransformer:
 
     # Load from config file
     def init_from_config(self):
+        self.epoch_fit_format = loadconfig.CONFIG["epoch_format"] == "FIT"
         self.cbuilders = {ck : list() for ck in self.colkeys if loadconfig.CONFIG[ck] == "true"}
         self.excludeflags = {ex : loadconfig.CONFIG[ex] == "true" for ex in ["exclude_empty_values", 
                                                                              "exclude_timestamp_values"]}
@@ -132,6 +136,7 @@ class TcxTransformer:
             mesg_name, field_name, units = loadconfig.TAG_FIELD_MAP[comptag]
             if comptag in loadconfig.TIMESTAMP_TAGS: 
                 self.timestamp = pd.to_datetime(field_value).tz_localize(None)
+                if self.epoch_fit_format: self.timestamp -= self.UNIX_FIT_OFFSET
 
             # Append field
             if (comptag not in loadconfig.TIMESTAMP_TAGS and not

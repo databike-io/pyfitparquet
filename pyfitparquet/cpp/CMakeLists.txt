@@ -45,12 +45,14 @@ target_link_libraries(fitdecoder PRIVATE fitsdk)
 
 # Build fittransformer executable 
 add_executable(fittransformer fittransformer.cc)
-target_link_libraries(fittransformer PRIVATE arrow_shared parquet_shared Boost::filesystem fitsdk)
+target_link_libraries(fittransformer PRIVATE arrow_shared parquet_shared 
+    Boost::filesystem fitsdk)
 
 # Build fittransformer_so cpython module
 pybind11_add_module(fittransformer_so fittransformer.cc fittransformer_so.cc)
+target_compile_definitions(fittransformer_so PRIVATE -DPYBIND11_PRINT_PYSTDOUT)
 target_link_libraries(fittransformer_so PRIVATE arrow_shared parquet_shared
-    fitsdk Boost::filesystem pybind11::module pybind11::lto)
+    Boost::filesystem pybind11::module pybind11::lto fitsdk)
 
 # =====================
 # Install (for setup.py)

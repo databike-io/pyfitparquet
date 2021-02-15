@@ -16,8 +16,11 @@ echo "=="
 echo
 
 rm -rf pyfit-build pyfit-install
-pip uninstall --yes pyfitparquet 
-rm -rf ${CONDA_PREFIX}/lib/python3.8/site-packages/pyfitparquet
-rm ${CONDA_PREFIX}/lib/libfitsdk.dylib
-rm ${CONDA_PREFIX}/bin/fittransformer
-rm ${CONDA_PREFIX}/bin/fitdecoder
+pip uninstall --yes pyfitparquet
+
+pushd ${CONDA_PREFIX} > /dev/null
+rm -rf  `find . -name 'pyfitparquet'`
+rm -f `find . -name 'libfitsdk.dylib'`
+rm -f `find . -name 'fittransformer'`
+rm -f `find . -name 'fitdecoder'`
+popd > /dev/null

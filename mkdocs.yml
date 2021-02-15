@@ -1,0 +1,4 @@
+site_name: PyFitParquet
+nav:
+    - PyFitParquet: index.md
+theme: readthedocs

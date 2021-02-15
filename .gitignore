@@ -10,11 +10,10 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 
-# Temporarily exclude
-docs/
-mkdocs.yml
-
-notebooks/*_config.yml
+# In case extraneous test files not removed
+tests/fixtures/parquet
+tests/*.yml*
+tmp_output
 
 # Python cache
 __pycache__
@@ -28,7 +27,7 @@ __pycache__
 # Mac desktop services store
 .DS_Store/
 
-# Build, dep and data and dirs
+# Build, dec-dep and data dirs
 pyfit-build/
 arrow/
 data/

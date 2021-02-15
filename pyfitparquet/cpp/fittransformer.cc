@@ -8,6 +8,10 @@
 #include "fittransformer.h"
 #include "config.h"
 
+#if defined PYBIND11_PRINT_PYSTDOUT
+#include <pybind11/pybind11.h>
+#endif 
+
 
 FitTransformer::FitTransformer() : 
     time_created(FIT_DATE_TIME_INVALID), manufacturer_index(FIT_MANUFACTURER_INVALID),
@@ -47,8 +51,12 @@ int FitTransformer::fit_to_parquet(const char fit_fname[], const char parquet_fn
         _write_parquet(parquet_fname);
         status = 0;
     }
+    #if defined PYBIND11_PRINT_PYSTDOUT
+    catch (const std::exception& e) { pybind11::print(e.what()); }
+    #else
     catch (const std::exception& e) { std::cerr << e.what() << std::endl; }
- 
+    #endif 
+
     _reset_state();
     return status;
 }
@@ -129,19 +137,25 @@ void FitTransformer::OnMesg(fit::Mesg& mesg)
                     }
                 }
 
-                // Finalize timestamp on mesg block of rows
-                if (timestamp_a == FIT_DATE_TIME_INVALID)
-                    PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::TimestampBuilder>(
-                    builders["timestamp"])->AppendNulls(nfields));
-                else if (CONFIG["epoch_format"] == "UNIX")
-                    PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::TimestampBuilder>(
-                    builders["timestamp"])->AppendValues(std::vector<std::int64_t>(
-                    nfields, static_cast<std::int64_t>(timestamp_a) + 631065600)));
-                else PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::TimestampBuilder>(
-                    builders["timestamp"])->AppendValues(std::vector<std::int64_t>(
-                    nfields, static_cast<std::int64_t>(timestamp_a))));
+                if (colflags["timestamp"]) {
+                    // Finalize timestamp on mesg block of rows
+                    if (timestamp_a == FIT_DATE_TIME_INVALID)
+                        PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::TimestampBuilder>(
+                        builders["timestamp"])->AppendNulls(nfields));
+                    else if (CONFIG["epoch_format"] == "UNIX")
+                        PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::TimestampBuilder>(
+                        builders["timestamp"])->AppendValues(std::vector<std::int64_t>(
+                        nfields, static_cast<std::int64_t>(timestamp_a) + 631065600)));
+                    else PARQUET_THROW_NOT_OK(std::dynamic_pointer_cast<arrow::TimestampBuilder>(
+                        builders["timestamp"])->AppendValues(std::vector<std::int64_t>(
+                        nfields, static_cast<std::int64_t>(timestamp_a))));
+                }
             }
+            #if defined PYBIND11_PRINT_PYSTDOUT
+            else pybind11::print("  Manufacturer/Product invalid, dropping:", mesg.GetName());
+            #else
             else std::cerr << "  Manufacturer/Product invalid, dropping: " << mesg.GetName() << std::endl;
+            #endif 
         }
     }
 }
@@ -316,7 +330,12 @@ std::tuple<FIELD_TYPE, FIT_SINT64, FIT_FLOAT64> FitTransformer::_get_field_type(
         break;
     
     default: 
+        #if defined PYBIND11_PRINT_PYSTDOUT
+        pybind11::print("Invalid FIT field datatype:", field.GetType());
+        #else
         std::cerr << "Invalid FIT field datatype: " << field.GetType() << std::endl;
+        #endif 
+
         return std::make_tuple(FIELD_TYPE::STRING_VALUE, 0, 0.0);
     }
 }

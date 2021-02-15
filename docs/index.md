@@ -1,4 +1,4 @@
-## PyFitParquet
+## Overview
 
 The ```conda-forge::pyfitparquet``` package provides ETL support for Garmin [FIT](https://developer.garmin.com/fit/overview/) and [TCX](https://en.wikipedia.org/wiki/Training_Center_XML) files into [Apache Parquet](https://parquet.apache.org/) columnar format. Two configuration files are used to fine-tune ETL behavior: [parquet_config.yml](https://github.com/databike-io/pyfitparquet/blob/main/pyfitparquet/parquet_config.yml) and [mapping_config.yml](https://github.com/databike-io/pyfitparquet/blob/main/pyfitparquet/mapping_config.yml). In general, these files control, respectively, the column and row structure of parquet output files, and the mapping of XML tag names (in TCX files) to the parquet field_name column. Please see verbose comments within the configuration files themselves for greater understanding of their use.
 
@@ -69,7 +69,7 @@ $ conda activate pyfitenv
 $ pip install .
 ```
 
-Please use the provided [uninstall.sh](https://github.com/databike-io/pyfitparquet/blob/main/uninstall.sh) if you want to remove the ```pyfitparquet``` package (just using ```pip uninstall pyfitparquet``` is **not** sufficient to remove all installed components). 
+Please use the provided [uninstall.sh](https://github.com/databike-io/pyfitparquet/blob/main/uninstall.sh) if you want to remove the ```pyfitparquet``` package (just using ```pip uninstall pyfitenv``` is **not** sufficient to remove all components). 
 
 ___
 ### CLI Usage:
@@ -88,16 +88,3 @@ To ETL TCX (or FIT) file to Parquet-file using the Python interface:
 ```
 python pyfitparquet/transformer.py <SOURCE_FILE_URI> [-P PARQUET_DIR] 
 ```
-___
-### TODOs:
-
-- **X** Add Garmin XSD schemas to the repo
-- **X** Create complete compound tag mapping (and generate-script) from XSD
-- **X** Download and test against all TCX files in https://github.com/cjoakim/ggps/tree/master/data
-- **X** Add API controllable parquet_config.yml parameters (maybe?) (**cancelled - requiring config file manipulation from USER and address w/consistent pip/conda install location, this also addresses PYTHONPATH variablity too**)
-- **X** Implement pip/conda packaging and build procedure
-- **X** Add C++ cout/cerr logging redirects to python sys.stdout, sys.stderr 
-- **X** Implement a more definitive pytest sequence
-- **X** Create mkdocs page describing python and C++ API (and update repo README)
-- Licensing?? Need to address and add disclaimer comments to src files
-- Create conda-forge meta.yaml recipe and submit for public download 

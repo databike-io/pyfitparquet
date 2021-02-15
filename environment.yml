@@ -5,16 +5,24 @@ channels:
 dependencies:
   - python==3.8
   - cmake
+  - boost
   - arrow-cpp
   - pybind11
   - defusedxml
+
+  # For pip install
   - setuptools
+  - pip
+
+  # For unit tests
+  - pandas
+  - pyarrow
+
+  # For documentation
   - mkdocs
 
-  # For notebook tests
+  # For notebooks
   - nodejs
   - jupyterlab
-  - pandas
   - openjdk
-  - pyarrow
   - pyspark

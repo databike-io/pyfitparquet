@@ -4,11 +4,12 @@ set -e
 
 THIS_SCRIPT=$(basename $0)
 if [ ! -f "$THIS_SCRIPT" ]; then
-    echo "ERROR: must execute this script from pyfitparquet root directory"
+    echo "ERROR: must execute this script from pyfitparquet scripts directory"
     echo
     exit 1
 fi
 
+pushd .. > /dev/null
 : ${PYFITPARQUET_ROOT:=${PWD}}
 : ${ARROW_CPP:=${PYFITPARQUET_ROOT}/arrow/cpp}
 : ${ARROW_INSTALL:=${ARROW_CPP}/arrow-install}
@@ -28,8 +29,8 @@ echo "=="
 echo "== Building Arrow C++ library"
 echo "=="
 echo
-cd $ARROW_CPP
-cmake -H. -Barrow-build \
+pushd $ARROW_CPP > /dev/null
+cmake -S. -Barrow-build \
     -DARROW_BUILD_STATIC=OFF \
     -DARROW_BUILD_SHARED=ON \
     -DARROW_PARQUET=ON \
@@ -40,3 +41,5 @@ cmake -H. -Barrow-build \
     -DCMAKE_INSTALL_PREFIX=${ARROW_INSTALL}
 
 cmake --build arrow-build --target install
+popd  > /dev/null
+popd  > /dev/null
