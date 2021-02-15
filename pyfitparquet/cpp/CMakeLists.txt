@@ -13,9 +13,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # Don't strip RPATH on install
 set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
+set(CMAKE_INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 
 # FitSDK version
-set(FITSDK_VERSION FitCppSDK_21.40.00)
+set(FITSDK_VERSION FitCppSDK_21.47.00)
 
 # Import Apache, Boost, Python, pybind11 build configs
 find_package(Arrow CONFIG REQUIRED)
