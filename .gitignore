@@ -10,10 +10,11 @@ compile_commands.json
 CTestTestfile.cmake
 _deps
 
-# In case extraneous test files not removed
+# Extraneous example generated files
 tests/fixtures/parquet
 tests/*.yml*
-tmp_output
+example_output
+*.parquet
 
 # Python cache
 __pycache__

@@ -1,65 +1,13 @@
 ## PyFitParquet
 
-The ```conda-forge::pyfitparquet``` package provides ETL support for Garmin [FIT](https://developer.garmin.com/fit/overview/) and [TCX](https://en.wikipedia.org/wiki/Training_Center_XML) files into [Apache Parquet](https://parquet.apache.org/) columnar format. Two configuration files are used to fine-tune ETL behavior: [parquet_config.yml](https://github.com/databike-io/pyfitparquet/blob/main/pyfitparquet/parquet_config.yml) and [mapping_config.yml](https://github.com/databike-io/pyfitparquet/blob/main/pyfitparquet/mapping_config.yml). In general, these files control, respectively, the column and row structure of parquet output files, and the mapping of XML tag names (in TCX files) to the parquet field_name column. Please see verbose comments within the configuration files themselves for greater understanding of their use.
+The ```pyfitparquet``` package provides support for Garmin [FIT](https://developer.garmin.com/fit/overview/) and [TCX](https://en.wikipedia.org/wiki/Training_Center_XML) file ETL into [Apache Parquet](https://parquet.apache.org/) columnar format. It is designed to be used within a conda environment. Two configuration files are used to fine-tune ETL behavior: [parquet_config.yml](https://github.com/databike-io/pyfitparquet/blob/main/pyfitparquet/parquet_config.yml) and [mapping_config.yml](https://github.com/databike-io/pyfitparquet/blob/main/pyfitparquet/mapping_config.yml). In general, these files control, respectively, the column and row structure of parquet output files, and the mapping of TCX tag names to FIT/Parquet field_names. Please see verbose comments within the configuration files themselves for greater understanding of their use.  
 
-Though the configuration files can be modified directly in-place in your conda environment (under ```$CONDA_PREFIX``` install tree), any re-installation of ```pyfitparquet``` will revert your changes to the defaults. To maintain a persistent configuration across installations, set the ```PYFIT_CONFIG_DIR``` environment variable to a directory path of your choice and place local versions of the files there. These files will not be overwritten or removed on uninstall. (Note: if ```PYFIT_CONFIG_DIR``` is set, but ```pyfitparquet``` cannot find the configuration files there, it will copy in default versions of the files from the current conda ```pyfitparquet``` installation.)
-
-___
-### Python Code Example
-
-```python
-import os, shutil, yaml, pandas, pyarrow
-from pyfitparquet import transformer
-
-# Source and output file locations
-DATA_DIR, OUTPUT_DIR = './tests/fixtures', './tmp_output'
-if not os.path.exists(OUTPUT_DIR): os.mkdir(OUTPUT_DIR)
-
-# Keep local copies of configuration files
-os.environ['PYFIT_CONFIG_DIR'] = OUTPUT_DIR
-
-# Serialize all FIT/TCX files in DATA_DIR to parquet
-pyfitparq = transformer.PyFitParquet()
-pyfitparq.data_to_parquet(DATA_DIR, parquet_dir=OUTPUT_DIR)
-
-# Display 
-df_fit = pandas.read_parquet('tmp_output/Who_Dares_Sufferfest.parquet', engine='pyarrow')
-df_tcx = pandas.read_parquet('tmp_output/45_min_Power_Zone_Ride.parquet', engine='pyarrow')
-print('Displaying: tmp_output/Who_Dares_Sufferfest.parquet\n', df_fit)
-print('Displaying: tmp_output/45_min_Power_Zone_Ride.parquet\n', df_tcx)
-
-# Make a configuration file change
-local_config_file = 'tmp_output/parquet_config.yml'
-local_config_file_tmp = 'tmp_output/parquet_config.yml.tmp'
-with open(local_config_file) as read_fhandle:
-#{
-    pconfig_map = yaml.safe_load(read_fhandle)
-    pconfig_map['epoch_format'] = 'FIT'
-    pconfig_map['source_filetype'] = True
-    pconfig_map['source_filename'] = False
-
-    with open(local_config_file_tmp, 'w') as write_fhandle:
-        yaml.safe_dump(pconfig_map, write_fhandle)
-#}
-
-shutil.move(local_config_file_tmp, local_config_file)
-pyfitparq.reset_from_config()
-
-# Serialize single FIT/TCX file to parquet
-pyfitparq.source_to_parquet('tests/fixtures/Who_Dares_Sufferfest.fit', parquet_dir=OUTPUT_DIR)
-pyfitparq.source_to_parquet('tests/fixtures/45_min_Power_Zone_Ride.tcx', parquet_dir=OUTPUT_DIR)
-
-# Display 
-df_fit = pandas.read_parquet('tmp_output/Who_Dares_Sufferfest.parquet', engine='pyarrow')
-df_tcx = pandas.read_parquet('tmp_output/45_min_Power_Zone_Ride.parquet', engine='pyarrow')
-print('Displaying: tmp_output/Who_Dares_Sufferfest.parquet\n', df_fit)
-print('Displaying: tmp_output/45_min_Power_Zone_Ride.parquet\n', df_tcx)
-```
+Though the configuration files can be modified directly in-place under the ```$CONDA_PREFIX``` install tree, any re-installation of ```pyfitparquet``` will revert configuration to the default. To maintain a persistent configuration across installations, set the ```PYFIT_CONFIG_DIR``` environment variable to a directory path of your choice and place local versions of the configuration files there. These files will not be overwritten or removed on uninstall. (Note: if ```PYFIT_CONFIG_DIR``` is set, but ```pyfitparquet``` cannot find the configuration files there, it will copy in default versions of the files from the current conda ```pyfitparquet``` installation.)
 
 ___
-### Building from Source
+### Build and Install from Source
 
-The suggested method to build from source is to use ```pip```, which will build libraries implicitly and install them into a conda environment. In addition to installation of the python module, two CLI executables are installed: **fitdecoder**, which prints the contents of a FIT file to std::cout, and **fittransformer**, which performs a FIT-to-Parquet file ETL. Thus to build and install:
+The suggested method to build from source is to use ```pip```, which will build libraries implicitly and install them into a conda environment. In addition to installation of the python ```pyfitparquet``` module, two CLI executables are installed: **fitdecoder**, which prints the contents of a FIT file to std::cout, and **fittransformer**, which performs a FIT-to-Parquet file ETL. (Note: build requires C++ compiler). Thus, to build and install:
 
 ```
 $ git clone https://github.com/databike-io/pyfitparquet.git
@@ -69,35 +17,50 @@ $ conda activate pyfitenv
 $ pip install .
 ```
 
-Please use the provided [uninstall.sh](https://github.com/databike-io/pyfitparquet/blob/main/uninstall.sh) if you want to remove the ```pyfitparquet``` package (just using ```pip uninstall pyfitparquet``` is **not** sufficient to remove all installed components). 
+Please execute the provided [uninstall.sh](https://github.com/databike-io/pyfitparquet/blob/main/uninstall.sh) to remove the ```pyfitparquet``` package (```pip uninstall pyfitparquet``` alone is **not** sufficient to remove all installed components). 
 
 ___
-### CLI Usage:
+### Execution Quickstart
+ 
+From python in an activated conda environment with ```pyfitparquet``` installed, the following will ETL all FIT/TCX files located in ```data_dir``` and output parquet files to a default ```f'{data_dir}/parquet'``` directory:
+```python
+>>> from pyfitparquet import transformer
+>>> pyfitparq = transformer.PyFitParquet()
+>>> pyfitparq.data_to_parquet(data_dir='./tests/fixtures')
+```
 
-To use CLI executables ETL a single FIT-file to Parquet-file (does **not** support TCX files):
+To ETL individual FIT/TCX files:
+```python
+>>> from pyfitparquet import transformer
+>>> pyfitparq = transformer.PyFitParquet()
+>>> pyfitparq.source_to_parquet('./tests/fixtures/Who_Dares_Sufferfest.fit', parquet_dir='.')
+>>> pyfitparq.source_to_parquet('./tests/fixtures/45_min_Power_Zone_Ride.tcx', parquet_dir='.')
+```
+
+For a more complete example that includes configuration changes and reading/display of parquet files see: [example.py](https://github.com/databike-io/pyfitparquet/blob/main/example.py)
+
+___
+### CLI Usage
+
+To use CLI executables to ETL a single FIT-file (**not** TCX) to Parquet-file:
 ```
 $ fittransformer <FIT_FILE_URI> <PARQUET_FILE_URI> 
+```
+
+To ETL a single TCX or FIT file to Parquet-file using the Python CLI interface:
+```
+$ python pyfitparquet/transformer.py <SOURCE_FILE_URI> [-P PARQUET_DIR] 
 ```
 
 To decode a single FIT-file to std::cout (default functionality provided by Garmin CPP FitSDK):
 ```
 $ fitdecoder <FIT_FILE_URI> 
 ```
-
-To ETL TCX (or FIT) file to Parquet-file using the Python interface:
-```
-python pyfitparquet/transformer.py <SOURCE_FILE_URI> [-P PARQUET_DIR] 
-```
 ___
-### TODOs:
+### Licenses and Attributions
 
-- **X** Add Garmin XSD schemas to the repo
-- **X** Create complete compound tag mapping (and generate-script) from XSD
-- **X** Download and test against all TCX files in https://github.com/cjoakim/ggps/tree/master/data
-- **X** Add API controllable parquet_config.yml parameters (maybe?) (**cancelled - requiring config file manipulation from USER and address w/consistent pip/conda install location, this also addresses PYTHONPATH variablity too**)
-- **X** Implement pip/conda packaging and build procedure
-- **X** Add C++ cout/cerr logging redirects to python sys.stdout, sys.stderr 
-- **X** Implement a more definitive pytest sequence
-- **X** Create mkdocs page describing python and C++ API (and update repo README)
-- Licensing?? Need to address and add disclaimer comments to src files
-- Create conda-forge meta.yaml recipe and submit for public download 
++ Two licenses are provided with this project: 
+    + All files (CPP source and TCX schemas) statically included in this repo under directory [FitCppSDK_21.47.00](https://github.com/databike-io/pyfitparquet/tree/main/pyfitparquet/FitCppSDK_21.47.00) are the property of [Garmin, LTD](https://developer.garmin.com/fit/download/), statically included solely for FitSdk lib build and version control stability, and licensed under [GARMIN_FIT_SDK_LICENSE](https://github.com/databike-io/pyfitparquet/tree/main/pyfitparquet/FitCppSDK_21.47.00/GARMIN_FIT_SDK_LICENSE).  
+    + All other source code in this repo is authored by AJ Donich (or other project contributors) and, to the extent legally applicable and not the purview of upstream licenses, provided as open source under [Apache License 2.0](https://github.com/databike-io/pyfitparquet/blob/main/LICENSE).
++ Five TCX [test data files](https://github.com/databike-io/pyfitparquet/tree/main/tests/fixtures) were gratefully borrowed from [Chris Joakim's ggps](https://github.com/cjoakim/ggps) project.  
++ The ```pyfitparquet``` package has several upstream open source dependencies (Apache Arrow, Pybind11, Boost, to name a few). We are grateful for these open APIs and acknowledge many different licenses are employed by these projects. Please see [environment.yml](https://github.com/databike-io/pyfitparquet/blob/main/environment.yml) for PyFitParquet's direct dependencies and corresponding respective repos for specific licenses.
