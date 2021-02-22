@@ -12,7 +12,7 @@ class TestSerialization(unittest.TestCase):
     #{
         print("\nSetting up TestSerialization")
 
-        DATA_DIR = os.path.join(os.getcwd(), 'fixtures')
+        DATA_DIR = os.path.join(os.path.dirname(__file__), 'fixtures')
         cls.PARQUET_DIR = os.path.join(DATA_DIR, 'parquet')
         if os.path.isdir(cls.PARQUET_DIR):
             shutil.rmtree(cls.PARQUET_DIR)
@@ -119,7 +119,7 @@ class TestConfiguration(unittest.TestCase):
     #{
         print("\nSetting up TestConfiguration")
 
-        DATA_DIR = os.path.join(os.getcwd(), 'fixtures')
+        DATA_DIR = os.path.join(os.path.dirname(__file__), 'fixtures')
         cls.PARQUET_DIR = os.path.join(DATA_DIR, 'parquet')
         if os.path.isdir(cls.PARQUET_DIR): shutil.rmtree(cls.PARQUET_DIR)
         os.mkdir(cls.PARQUET_DIR) 
@@ -132,7 +132,6 @@ class TestConfiguration(unittest.TestCase):
 
         # Setup starting environment variable settings        
         assert 'CONDA_PREFIX' in os.environ, "ERROR: CONDA_PREFIX must be set"
-        assert os.getenv('CONDA_DEFAULT_ENV') == 'pyfitenv', "ERROR: conda pyfitenv must be activated"
         parquet_config_base = loadconfig.find_file("parquet_config.yml", os.environ['CONDA_PREFIX'])
         mapping_config_base = loadconfig.find_file("mapping_config.yml", os.environ['CONDA_PREFIX'])
         assert parquet_config_base and mapping_config_base, "ERROR: no config in pyfitparquet install" 
@@ -142,8 +141,8 @@ class TestConfiguration(unittest.TestCase):
         if 'PYFIT_CONFIG_DIR' in os.environ: del os.environ['CONDA_PREFIX']
 
         # Setup starting local config file settings
-        cls.parquet_config_local = os.path.join(os.getcwd(), 'parquet_config.yml')
-        cls.mapping_config_local = os.path.join(os.getcwd(), 'mapping_config.yml')
+        cls.parquet_config_local = os.path.join(os.path.dirname(__file__), 'parquet_config.yml')
+        cls.mapping_config_local = os.path.join(os.path.dirname(__file__), 'mapping_config.yml')
         if os.path.isfile(cls.parquet_config_local): os.remove(cls.parquet_config_local)
         if os.path.isfile(cls.mapping_config_local): os.remove(cls.mapping_config_local)
     #}
@@ -184,7 +183,7 @@ class TestConfiguration(unittest.TestCase):
 
         # (3) Input: CONDA_PREFIX not set, PYFIT_CONFIG_DIR is set, no local files
         # Expected result: assertion error, can't find config_files
-        os.environ['PYFIT_CONFIG_DIR'] = os.getcwd()
+        os.environ['PYFIT_CONFIG_DIR'] = os.path.dirname(__file__)
         with self.assertRaises(AssertionError):
             loadconfig.populate_config()
         
@@ -236,7 +235,7 @@ class TestConfiguration(unittest.TestCase):
         colset = set(columns)
         if os.path.isfile(self.parquet_config_local): os.remove(self.parquet_config_local)
         if os.path.isfile(self.mapping_config_local): os.remove(self.mapping_config_local)
-        os.environ['PYFIT_CONFIG_DIR'] = os.getcwd()
+        os.environ['PYFIT_CONFIG_DIR'] = os.path.dirname(__file__)
         pyfitparq = transformer.PyFitParquet()
 
         for i in range(self.NCOLUMN_TRIALS):

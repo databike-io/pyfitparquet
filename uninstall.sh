@@ -15,7 +15,7 @@ echo "== Uninstalling and cleaning pyfitparquet"
 echo "=="
 echo
 
-rm -rf pyfit-build pyfit-install
+rm -rf cmake-build/ dist/ build/ pyfitparquet.egg-info/ 
 pip uninstall --yes pyfitparquet
 
 pushd ${CONDA_PREFIX} > /dev/null

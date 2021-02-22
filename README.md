@@ -26,15 +26,15 @@ From python in an activated conda environment with ```pyfitparquet``` installed,
 ```python
 >>> from pyfitparquet import transformer
 >>> pyfitparq = transformer.PyFitParquet()
->>> pyfitparq.data_to_parquet(data_dir='./tests/fixtures')
+>>> pyfitparq.data_to_parquet(data_dir='./test/fixtures')
 ```
 
 To ETL individual FIT/TCX files:
 ```python
 >>> from pyfitparquet import transformer
 >>> pyfitparq = transformer.PyFitParquet()
->>> pyfitparq.source_to_parquet('./tests/fixtures/Who_Dares_Sufferfest.fit', parquet_dir='.')
->>> pyfitparq.source_to_parquet('./tests/fixtures/45_min_Power_Zone_Ride.tcx', parquet_dir='.')
+>>> pyfitparq.source_to_parquet('./test/fixtures/Who_Dares_Sufferfest.fit', parquet_dir='.')
+>>> pyfitparq.source_to_parquet('./test/fixtures/45_min_Power_Zone_Ride.tcx', parquet_dir='.')
 ```
 
 For a more complete example that includes configuration changes and reading/display of parquet files see: [example.py](https://github.com/databike-io/pyfitparquet/blob/main/example.py)
@@ -62,5 +62,5 @@ ___
 + Two licenses are provided with this project: 
     + All files (CPP source and TCX schemas) statically included in this repo under directory [FitCppSDK_21.47.00](https://github.com/databike-io/pyfitparquet/tree/main/pyfitparquet/FitCppSDK_21.47.00) are the property of [Garmin, LTD](https://developer.garmin.com/fit/download/), statically included solely for FitSdk lib build and version control stability, and licensed under [GARMIN_FIT_SDK_LICENSE](https://github.com/databike-io/pyfitparquet/tree/main/pyfitparquet/FitCppSDK_21.47.00/GARMIN_FIT_SDK_LICENSE).  
     + All other source code in this repo is authored by AJ Donich (or other project contributors) and, to the extent legally applicable and not the purview of upstream licenses, provided as open source under [Apache License 2.0](https://github.com/databike-io/pyfitparquet/blob/main/LICENSE).
-+ Five TCX [test data files](https://github.com/databike-io/pyfitparquet/tree/main/tests/fixtures) were gratefully borrowed from [Chris Joakim's ggps](https://github.com/cjoakim/ggps) project.  
++ Five TCX [test data files](https://github.com/databike-io/pyfitparquet/tree/main/test/fixtures) were gratefully borrowed from [Chris Joakim's ggps](https://github.com/cjoakim/ggps) project.  
 + The ```pyfitparquet``` package has several upstream open source dependencies (Apache Arrow, Pybind11, Boost, to name a few). We are grateful for these open APIs and acknowledge many different licenses are employed by these projects. Please see [environment.yml](https://github.com/databike-io/pyfitparquet/blob/main/environment.yml) for PyFitParquet's direct dependencies and corresponding respective repos for specific licenses.

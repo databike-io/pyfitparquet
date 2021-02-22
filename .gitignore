@@ -11,8 +11,8 @@ CTestTestfile.cmake
 _deps
 
 # Extraneous example generated files
-tests/fixtures/parquet
-tests/*.yml*
+test/fixtures/parquet
+test/*.yml*
 example_output
 *.parquet
 
@@ -28,10 +28,13 @@ __pycache__
 # Mac desktop services store
 .DS_Store/
 
-# Build, dec-dep and data dirs
+# Local build, deploy, doc and data dirs
 pyfit-build/
+cmake-build/
+pyfitparquet.egg-info/
+dist/
+build/ 
 arrow/
-data/
 site/
 
 # Prerequisites

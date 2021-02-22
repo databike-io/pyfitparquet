@@ -1,5 +1,4 @@
-import os, re
-import pandas as pd
+import os, re, pandas, pyarrow
 import defusedxml.ElementTree as ET
 from pyfitparquet import loadconfig
 
@@ -9,7 +8,7 @@ class TcxTransformer:
     FLOAT_VALUE = 2
     STRING_VALUE = 3
 
-    UNIX_FIT_OFFSET = pd.Timedelta(value=631065600, unit='seconds')
+    UNIX_FIT_OFFSET = pandas.Timedelta(value=631065600, unit='seconds')
 
     def __init__(self):
     #{
@@ -57,7 +56,7 @@ class TcxTransformer:
         
         # Write to parquet file
         table = {ck : self.cbuilders[ck] for ck in self.colkeys if ck in self.cbuilders}
-        pd.DataFrame(table).to_parquet(path=parquet_fname, engine='pyarrow')
+        pandas.DataFrame(table).to_parquet(path=parquet_fname, engine='pyarrow')
         self.reset_state()
         return 0
     #}
@@ -135,7 +134,7 @@ class TcxTransformer:
             # Update timestamp
             mesg_name, field_name, units = loadconfig.TAG_FIELD_MAP[comptag]
             if comptag in loadconfig.TIMESTAMP_TAGS: 
-                self.timestamp = pd.to_datetime(field_value).tz_localize(None)
+                self.timestamp = pandas.to_datetime(field_value).tz_localize(None)
                 if self.epoch_fit_format: self.timestamp -= self.UNIX_FIT_OFFSET
 
             # Append field

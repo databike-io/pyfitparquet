@@ -9,7 +9,7 @@ from pyfitparquet import transformer
 
 
 # Source and output file locations
-DATA_DIR, OUTPUT_DIR = './tests/fixtures', './example_output'
+DATA_DIR, OUTPUT_DIR = './test/fixtures', './example_output'
 if not os.path.exists(OUTPUT_DIR): os.mkdir(OUTPUT_DIR)
 
 # Keep local copies of configuration files
@@ -48,8 +48,8 @@ pyfitparq.reset_from_config()
 
 # Serialize single FIT/TCX file to parquet
 print("Serializing FIT/TCX files...")
-pyfitparq.source_to_parquet('tests/fixtures/Who_Dares_Sufferfest.fit', parquet_dir=OUTPUT_DIR)
-pyfitparq.source_to_parquet('tests/fixtures/45_min_Power_Zone_Ride.tcx', parquet_dir=OUTPUT_DIR)
+pyfitparq.source_to_parquet('test/fixtures/Who_Dares_Sufferfest.fit', parquet_dir=OUTPUT_DIR)
+pyfitparq.source_to_parquet('test/fixtures/45_min_Power_Zone_Ride.tcx', parquet_dir=OUTPUT_DIR)
 
 # Display 
 df_fit = pandas.read_parquet('example_output/Who_Dares_Sufferfest.parquet', engine='pyarrow')

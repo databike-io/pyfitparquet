@@ -9,14 +9,12 @@ dependencies:
   - arrow-cpp
   - pybind11
   - defusedxml
+  - pandas
+  - pyarrow
 
   # For pip install
   - setuptools
   - pip
-
-  # For unit tests
-  - pandas
-  - pyarrow
 
   # For documentation
   - mkdocs

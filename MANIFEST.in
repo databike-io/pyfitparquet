@@ -1,0 +1,21 @@
+global-include *
+
+exclude *.parquet
+exclude mkdocs.yml 
+
+exclude .gitignore
+exclude .gitattributes
+recursive-exclude .git *
+
+recursive-exclude docs *
+recursive-exclude notebooks *
+recursive-exclude scripts *
+recursive-exclude example_output *
+recursive-exclude pyfit-build *
+recursive-exclude arrow *
+recursive-exclude site *
+
+recursive-exclude test *.yml*
+recursive-exclude test/fixtures/parquet *
+recursive-exclude pyfitparquet/__pycache__ *
+recursive-exclude pyfitparquet/cmake-build *
