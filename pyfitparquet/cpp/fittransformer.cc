@@ -1,3 +1,4 @@
+#include <math.h> 
 #include <arrow/api.h>
 #include <arrow/io/api.h>
 #include <parquet/arrow/writer.h>
@@ -314,7 +315,7 @@ std::tuple<FIELD_TYPE, FIT_SINT64, FIT_FLOAT64> FitTransformer::_get_field_type(
         FIT_SINT64 ival = field.GetSINT64Value(j);
         
         static double TINY_NUMBER = .00000001;
-        if (std::fabs(fval - ival) < TINY_NUMBER) 
+        if (fabs(fval - ival) < TINY_NUMBER) 
             return std::make_tuple(FIELD_TYPE::INT_VALUE, ival, fval);
         else return std::make_tuple(FIELD_TYPE::FLOAT_VALUE, ival, fval);
         break;

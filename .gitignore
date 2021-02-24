@@ -29,7 +29,6 @@ __pycache__
 .DS_Store/
 
 # Local build, deploy, doc and data dirs
-pyfit-build/
 cmake-build/
 pyfitparquet.egg-info/
 dist/

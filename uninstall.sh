@@ -1,13 +1,5 @@
-#!/bin/bash
-
+#!/usr/bin/env bash
 set -e
-
-THIS_SCRIPT=$(basename $0)
-if [ ! -f "$THIS_SCRIPT" ]; then
-    echo "ERROR: must execute this script from pyfitparquet root directory"
-    echo
-    exit 1
-fi
 
 echo
 echo "=="
@@ -15,8 +7,10 @@ echo "== Uninstalling and cleaning pyfitparquet"
 echo "=="
 echo
 
+pushd $(dirname "$0") > /dev/null
 rm -rf cmake-build/ dist/ build/ pyfitparquet.egg-info/ 
 pip uninstall --yes pyfitparquet
+popd > /dev/null
 
 pushd ${CONDA_PREFIX} > /dev/null
 rm -rf  `find . -name 'pyfitparquet'`

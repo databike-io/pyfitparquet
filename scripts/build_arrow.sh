@@ -1,20 +1,12 @@
-#!/bin/bash
-
+#!/usr/bin/env bash
 set -e
 
-THIS_SCRIPT=$(basename $0)
-if [ ! -f "$THIS_SCRIPT" ]; then
-    echo "ERROR: must execute this script from pyfitparquet scripts directory"
-    echo
-    exit 1
-fi
-
-pushd .. > /dev/null
-: ${PYFITPARQUET_ROOT:=${PWD}}
+PYFITPARQUET_ROOT=$(cd "$(dirname "$0")/.."; pwd;)
 : ${ARROW_CPP:=${PYFITPARQUET_ROOT}/arrow/cpp}
 : ${ARROW_INSTALL:=${ARROW_CPP}/arrow-install}
 : ${ARROW_PYTHON:=${PYFITPARQUET_ROOT}/arrow/python}
 
+pushd ${PYFITPARQUET_ROOT} > /dev/null
 if [ ! -d "$ARROW_CPP" ]; then
     echo
     echo "=="

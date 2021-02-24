@@ -1,0 +1,66 @@
+
+{% set pyfit_version = "1.0" %}
+{% set fitsdk_version = "FitCppSDK_21.47.00" %}
+
+
+package:
+  name: pyfitparquet
+  version: {{ pyfit_version }}
+
+source:
+  # url: https://github.com/databike-io/pyfitparquet/releases/download/{{ pyfit_version }}/pyfitparquet-{{ pyfit_version }}.tar.gz
+  # sha256: 82799a24df1d0aaf995c7483ae5b0e8bcc6ab600f2f3e484160e440711e895ab
+
+  # Local/osx test
+  # url: /Users/ajdonich/OneDrive/iMac/Development/databike-io/pyfitparquet/dist/pyfitparquet-{{ pyfit_version }}.tar.gz
+  # sha256: 24e3fa0cb3fbe3ef1862048856d04d8355dc082f2e7d634e9a0c828d64e16fa3
+
+  # Docker/linux test
+  # url: /home/conda-builder/dist/pyfitparquet-{{ pyfit_version }}.tar.gz
+  # sha256: 24e3fa0cb3fbe3ef1862048856d04d8355dc082f2e7d634e9a0c828d64e16fa3
+
+build:
+  number: 0
+  skip: true # [win or py<36]
+  script: "{{ PYTHON }} -m pip install . -vv"
+
+requirements:
+  build:
+    - cmake
+    - {{ compiler('cxx') }}
+  host:
+    - python {{ python }}
+    - boost-cpp {{ boostcpp }}
+    - arrow-cpp
+    - pybind11
+  run:
+    - python {{ python }}
+    - boost-cpp {{ boostcpp }}
+    - boost
+    - pyyaml
+    - defusedxml
+    - pandas
+    - pyarrow
+
+test:
+  source_files:
+    - test
+
+about:
+  home: https://github.com/databike-io/pyfitparquet
+  license: Apache-2.0
+  license_family: APACHE
+  license_file: 
+    - LICENSE
+    - pyfitparquet/{{ fitsdk_version }}/GARMIN_FIT_SDK_LICENSE
+  summary: 'ETL support of Garmin FIT/TCX files to Apache Parquet'
+  description: |
+    The pyfitparquet package provides support for Garmin [FIT](https://developer.garmin.com/fit/overview/) and 
+    [TCX](https://en.wikipedia.org/wiki/Training_Center_XML) file ETL into [Apache Parquet](https://parquet.apache.org/) 
+    columnar format. It leverages the fast Garmin SDK CPP decoding interface for FIT files and pure Python for TCX files.
+  doc_url: https://databike-io.github.io/pyfitparquet/
+  dev_url: https://github.com/databike-io/pyfitparquet
+
+extra:
+  recipe-maintainers:
+    - ajdonich
