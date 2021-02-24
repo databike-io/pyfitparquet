@@ -35,7 +35,7 @@ int FitTransformer::fit_to_parquet(const char fit_fname[], const char parquet_fn
         // Validate FIT file
         fit::Decode fit_decoder;
         if (!fit_decoder.CheckIntegrity(fit_fhandle)) throw std::runtime_error(
-            std::string("Integrity FAILURE for FIT file: ") + fit_fname);
+            std::string("FIT file integrity FAILURE: ") + fit_fname);
         
         // Record FIT filename/uri
         boost::filesystem::path pfit(fit_fname);

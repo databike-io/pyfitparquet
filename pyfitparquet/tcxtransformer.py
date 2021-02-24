@@ -2,6 +2,7 @@ import os, re, pandas, pyarrow
 import defusedxml.ElementTree as ET
 from pyfitparquet import loadconfig
 
+
 class TcxTransformer:
 #{
     INT_VALUE = 1
@@ -47,18 +48,24 @@ class TcxTransformer:
         self.source_filename = os.path.basename(tcx_fname)
         self.source_file_uri = os.path.abspath(tcx_fname)
         self.init_from_config()
+        status = 1
+
+        try:
+        #{
+            # Parse the TCX XML-tree recursively 
+            # XML parse requires NO leading whitespace
+            with open(tcx_fname) as f_handle:
+                xmlstring = f_handle.read().lstrip()
+                self.recurse_tree(ET.fromstring(xmlstring).iter())
         
-        # Parse the TCX XML-tree recursively 
-        # XML parse requires NO leading whitespace
-        with open(tcx_fname) as f_handle:
-            xmlstring = f_handle.read().lstrip()
-            self.recurse_tree(ET.fromstring(xmlstring).iter())
-        
-        # Write to parquet file
-        table = {ck : self.cbuilders[ck] for ck in self.colkeys if ck in self.cbuilders}
-        pandas.DataFrame(table).to_parquet(path=parquet_fname, engine='pyarrow')
-        self.reset_state()
-        return 0
+            # Write to parquet file
+            table = {ck : self.cbuilders[ck] for ck in self.colkeys if ck in self.cbuilders}
+            pandas.DataFrame(table).to_parquet(path=parquet_fname, engine='pyarrow')
+            self.reset_state()
+            status = 0
+        #}
+        except ET.ParseError: print(f"TCX file integrity FAILURE: {tcx_fname}")
+        return status
     #}
 
     # Re-read configuration file (client responsibility when desired)

@@ -1,4 +1,3 @@
-
 {% set pyfit_version = "1.0" %}
 {% set fitsdk_version = "FitCppSDK_21.47.00" %}
 
@@ -8,20 +7,12 @@ package:
   version: {{ pyfit_version }}
 
 source:
-  # url: https://github.com/databike-io/pyfitparquet/releases/download/{{ pyfit_version }}/pyfitparquet-{{ pyfit_version }}.tar.gz
-  # sha256: 82799a24df1d0aaf995c7483ae5b0e8bcc6ab600f2f3e484160e440711e895ab
-
-  # Local/osx test
-  # url: /Users/ajdonich/OneDrive/iMac/Development/databike-io/pyfitparquet/dist/pyfitparquet-{{ pyfit_version }}.tar.gz
-  # sha256: 24e3fa0cb3fbe3ef1862048856d04d8355dc082f2e7d634e9a0c828d64e16fa3
-
-  # Docker/linux test
-  # url: /home/conda-builder/dist/pyfitparquet-{{ pyfit_version }}.tar.gz
-  # sha256: 24e3fa0cb3fbe3ef1862048856d04d8355dc082f2e7d634e9a0c828d64e16fa3
+  url: https://github.com/databike-io/pyfitparquet/releases/download/{{ pyfit_version }}/pyfitparquet-{{ pyfit_version }}.tar.gz
+  sha256: d3cb5a589889b498a14b5d98d0ff341be3a6de9dd7308495a6d28ff735dd5878
 
 build:
   number: 0
-  skip: true # [win or py<36]
+  skip: true  # [win]
   script: "{{ PYTHON }} -m pip install . -vv"
 
 requirements:

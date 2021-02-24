@@ -7,17 +7,20 @@ Though the configuration files can be modified directly in-place under the ```$C
 ___
 ### Build and Install from Source
 
-The suggested method to build from source is to use ```pip```, which will build libraries implicitly and install them into a conda environment. In addition to installation of the python ```pyfitparquet``` module, two CLI executables are installed: **fitdecoder**, which prints the contents of a FIT file to std::cout, and **fittransformer**, which performs a FIT-to-Parquet file ETL. (Note: build requires C++ compiler). Thus, to build and install:
+The suggested method to build from source is to use ```pip```, which will build libraries implicitly and install them into a conda environment. In addition to installation of the python ```pyfitparquet``` module, two CLI executables are installed: **fitdecoder** prints the contents of a FIT file to std::cout, and **fittransformer** performs a FIT-to-Parquet file ETL.  
+
+**Note:** (1) building from source requires a C++ compiler installed on your system. (2) True clone of the repo's [FIT/TCX test data files](https://github.com/databike-io/pyfitparquet/tree/main/test/fixtures) requires [Git Large File Storage (LFS)](https://git-lfs.github.com/) is [installed](https://github.com/git-lfs/git-lfs/wiki/Installation) on your system (without LFS, only stubbed placeholder data files are cloned and execution of validation tests and examples referencing this test data will fail). (3) Please use the provided [uninstall.sh](https://github.com/databike-io/pyfitparquet/blob/main/uninstall.sh) script to remove the ```pyfitparquet``` package (```pip uninstall pyfitparquet``` alone is **not** sufficient to remove all installed components). To build, install and validate:
 
 ```
 $ git clone https://github.com/databike-io/pyfitparquet.git
 $ cd pyfitparquet
 $ conda env create -f environment.yml
 $ conda activate pyfitenv
-$ pip install .
-```
+$ pip install . -vv
 
-Please execute the provided [uninstall.sh](https://github.com/databike-io/pyfitparquet/blob/main/uninstall.sh) to remove the ```pyfitparquet``` package (```pip uninstall pyfitparquet``` alone is **not** sufficient to remove all installed components). 
+# And to run tests to validate install:
+$ python test/test_pyfitparquet.py
+```
 
 ___
 ### Execution Quickstart

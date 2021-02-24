@@ -22,7 +22,3 @@ dependencies:
   # For notebooks
   - nodejs
   - jupyterlab
-
-  # For spark queries
-  # - openjdk
-  # - pyspark
