@@ -1,4 +1,4 @@
-name: pyfitenv
+name: pyfitenv-dev
 channels:
   - conda-forge
 dependencies:
@@ -6,10 +6,14 @@ dependencies:
   - cmake
   - boost
   - arrow-cpp
+  - jupyterlab
   - defusedxml
+  - mkdocs
+  - openjdk
   - pandas
   - pip
   - pyarrow
   - pybind11
+  - pyspark
   - pip:
       - .
