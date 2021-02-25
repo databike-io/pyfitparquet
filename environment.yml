@@ -7,18 +7,14 @@ dependencies:
   - cmake
   - boost
   - arrow-cpp
-  - pybind11
-  - defusedxml
-  - pandas
-  - pyarrow
-
-  # For pip install
-  - setuptools
-  - pip
-
-  # For documentation
-  - mkdocs
-
-  # For notebooks
-  - nodejs
   - jupyterlab
+  - defusedxml
+  - mkdocs
+  - openjdk
+  - pandas
+  - pip
+  - pyarrow
+  - pybind11
+  - pyspark
+  - pip:
+      - .
