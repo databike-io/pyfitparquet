@@ -1,8 +1,23 @@
-python:
-  - 3.6
-  - 3.7
-  - 3.8
-  - 3.9
+# This file not currently even necessary for actual conda-feedstock build where full default pins apply:
+# https://github.com/conda-forge/conda-forge-pinning-feedstock/blob/master/recipe/conda_build_config.yaml
 
-boostcpp:
-  - 1.74
+pin_run_as_build:
+  boost-cpp:
+    max_pin: x.x.x
+
+boost_cpp:
+  - 1.74.0
+
+# For https://conda-forge.org/docs/maintainer/adding_pkgs.html#staging-test-locally test
+python:
+  - 3.6.* *_cpython
+  - 3.7.* *_cpython
+  - 3.8.* *_cpython
+
+# For conda_build.sh and docker_build.sh tests
+# python:
+#   - 3.6
+#   - 3.7
+#   - 3.8
+#   - 3.9
+

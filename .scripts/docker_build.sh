@@ -4,9 +4,15 @@ set -e
 PYFITPARQUET_SCRIPTS=$(cd "$(dirname "$0")"; pwd;)
 pushd ${PYFITPARQUET_SCRIPTS} > /dev/null
 source ~/.bash_profile
+rm -rf dist ; mkdir dist 
 
-rm -rf dist ; mkdir dist
+# For local sdist
 cp ../dist/*.gz dist/.
+
+# For GitHub release download
+# wget https://github.com/databike-io/pyfitparquet/releases/download/v1.0/pyfitparquet-1.0.tar.gz
+# mv *.gz dist/.
+
 docker build -t conda-builder .
 rm -rf dist
 
