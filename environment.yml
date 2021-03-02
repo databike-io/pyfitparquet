@@ -1,24 +1,17 @@
+  
 name: pyfitenv
 channels:
   - conda-forge
-
 dependencies:
-  - python==3.8
-  - cmake
-  - boost
+  - python=3.8
   - arrow-cpp
-  - pybind11
+  - boost
+  - cmake
   - defusedxml
   - pandas
-  - pyarrow
-
-  # For pip install
-  - setuptools
   - pip
-
-  # For documentation
-  - mkdocs
-
-  # For notebooks
-  - nodejs
-  - jupyterlab
+  - pyarrow
+  - pybind11
+  - pyyaml
+  - pip:
+      - .
